@@ -50,13 +50,12 @@ function main() {
     scene.add(directionalLight);
 
     // Create a cube
-    const cube = new Cube();
-    scene.add(cube.getMesh());
+    const tree = new SimpleTree(scene, 10);
+    tree.createTree();
 
     // Render Loop
     function animate() {
         controls.update();
-        cube.rotate(0.01);
         renderer.render(scene, camera);
     }
     renderer.setAnimationLoop(animate);
