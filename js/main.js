@@ -28,10 +28,6 @@ function main() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // User Configuration
-    const configManager = new ConfigManager(scene, camera);
-    configManager.initGUI();
-
     // Mouse Control
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.mouseButtons = {
@@ -49,11 +45,22 @@ function main() {
     directionalLight.position.set(10, 10, 10);
     scene.add(directionalLight);
 
-    // Create a cube
-    const tree = new SimpleTree(scene, 10);
-    tree.createTree();
+    // User control GUI
+    const gui = new DynamicGUI(scene);
+    gui.createGUI();
 
-    // Render Loop
+    // // Create a cube
+    // const aximon = "F";
+    // const rules = {
+    //     F: "FF+[+F-F-F]-[-F+F+F]",
+    // };
+    // const l_system = new LSystem(aximon, rules);
+    // const rule = l_system.generate(3);
+
+    // const tree = new LSystemTree(scene, rule);
+    // tree.generate();
+
+    // // Render Loop
     function animate() {
         controls.update();
         renderer.render(scene, camera);
