@@ -17,39 +17,36 @@ class Cylinder extends MyObject {
 
     static NAME = "Cylinder";
 
-    constructor(scene) {
-        super(scene);
-        const params = Cylinder.getParams();
+    constructor(
+        scene,
+        debugMode = false,
+        radiusTop = Cylinder.PARAMS.radiusTop,
+        radiusBottom = Cylinder.PARAMS.radiusBottom,
+        height = Cylinder.PARAMS.height,
+        radialSegments = Cylinder.PARAMS.radialSegments,
+        heightSegments = Cylinder.PARAMS.heightSegments,
+        openEnded = Cylinder.PARAMS.openEnded,
+        thetaStart = Cylinder.PARAMS.thetaStart,
+        thetaLength = Cylinder.PARAMS.thetaLength,
+        colorRGB = Cylinder.PARAMS.color
+    ) {
+        super(scene, debugMode);
         this.geometry = new THREE.CylinderGeometry(
-            params.radiusTop,
-            params.radiusBottom,
-            params.height,
-            params.radialSegments,
-            params.heightSegments,
-            params.openEnded,
-            params.thetaStart,
-            params.thetaLength
+            radiusTop,
+            radiusBottom,
+            height,
+            radialSegments,
+            heightSegments,
+            openEnded,
+            thetaStart,
+            thetaLength
         );
-        const color = Utils.RGB2Color(
-            params.color.r,
-            params.color.g,
-            params.color.b
-        );
-        this.material = new THREE.MeshBasicMaterial({ color: color });
+        const color = Utils.RGB2Color(colorRGB.r, colorRGB.g, colorRGB.b);
+        this.material = new THREE.MeshBasicMaterial({
+            color: color,
+            wireframe: debugMode,
+        });
         this.mesh = new THREE.Mesh(this.geometry, this.material);
-        this.mesh.isMyObject = true;
-
-        this.wireframe = new THREE.WireframeGeometry(this.geometry);
-        this.line = new THREE.LineSegments(this.wireframe);
-        this.line.material.depthTest = false;
-        this.line.material.opacity = 0.5;
-        this.line.material.transparent = true;
-        this.line.isMyObject = true;
-    }
-
-    generate() {
-        super.generate();
-        this.scene.add(this.line);
     }
 
     static getParams() {

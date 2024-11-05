@@ -7,4 +7,20 @@ class Utils {
     static RGB2Color(r, g, b) {
         return new THREE.Color().setRGB(r / 255, g / 255, b / 255);
     }
+
+    static getUpVector() {
+        return Utils.UP.clone();
+    }
+
+    static getYVector() {
+        return Utils.Y.clone();
+    }
+
+    static getZVector() {
+        return Utils.Z.clone();
+    }
+
+    static getXVector() {
+        return Utils.X.clone();
+    }
 }

@@ -11,7 +11,7 @@ class DynamicGUI {
             object: DynamicGUI.DEFAULT_OBJECT,
         };
         this.parameterFolder = null;
-        this.objectList = [Cube.NAME, Cylinder.NAME];
+        this.objectList = [Cube.NAME, Cylinder.NAME, FlatTree.NAME];
 
         // Debug Mode
         this.redColor = new THREE.Color().setHex(0xff0000);
@@ -57,6 +57,9 @@ class DynamicGUI {
         } else {
             this.scene.remove(this.axesHelper);
         }
+
+        this.objectGenerator.setDebugMode(debugMode);
+        this.updateObject();
     }
 
     updateFolder() {
@@ -71,6 +74,9 @@ class DynamicGUI {
                 break;
             case Cylinder.NAME:
                 this.generateCylinderParameters();
+                break;
+            case FlatTree.NAME:
+                this.generateFlatTreeParameters();
                 break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
@@ -184,6 +190,71 @@ class DynamicGUI {
                 this.updateObject();
             });
         this.folder.addColor(cylinderParameters, "color").onChange(() => {
+            this.updateObject();
+        });
+    }
+
+    generateFlatTreeParameters() {
+        const flatTreeParameters = FlatTree.getParams();
+        this.folder
+            .add(flatTreeParameters, "iteration", 0, 10)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(flatTreeParameters, "rootThickness", 0.1, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(flatTreeParameters, "rootLength", 1, 10)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(flatTreeParameters, "branchThicknessScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(flatTreeParameters, "branchLengthScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(flatTreeParameters, "branchAngle", 0, Math.PI)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .addColor(flatTreeParameters, "branchRadioSegments", 0, 30)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(flatTreeParameters, "branchHeightSegments", 1, 30)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder.add(flatTreeParameters, "branchOpenEnded").onChange(() => {
+            this.updateObject();
+        });
+        this.folder
+            .add(flatTreeParameters, "branchThetaStart", 0, Math.PI * 2)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(flatTreeParameters, "branchThetaLength", 0, Math.PI * 2)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder.addColor(flatTreeParameters, "branchColor").onChange(() => {
             this.updateObject();
         });
     }

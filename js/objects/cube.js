@@ -11,53 +11,37 @@ class Cube extends MyObject {
             g: 141,
             b: 182,
         },
+        // debugMode: false,
     };
 
     static NAME = "Cube";
 
-    constructor(scene) {
-        super(scene);
-        const params = Cube.getParams();
+    constructor(
+        scene,
+        debugMode,
+        width = Cube.PARAMS.width,
+        height = Cube.PARAMS.height,
+        depth = Cube.PARAMS.depth,
+        widthSegments = Cube.PARAMS.widthSegments,
+        heightSegments = Cube.PARAMS.heightSegments,
+        depthSegments = Cube.PARAMS.depthSegments,
+        colorRGB = Cube.PARAMS.color
+    ) {
+        super(scene, debugMode);
         this.geometry = new THREE.BoxGeometry(
-            params.width,
-            params.height,
-            params.depth,
-            params.widthSegments,
-            params.heightSegments,
-            params.depthSegments
+            width,
+            height,
+            depth,
+            widthSegments,
+            heightSegments,
+            depthSegments
         );
-        const color = Utils.RGB2Color(
-            params.color.r,
-            params.color.g,
-            params.color.b
-        );
-        this.material = new THREE.MeshBasicMaterial({ color: color });
+        const color = Utils.RGB2Color(colorRGB.r, colorRGB.g, colorRGB.b);
+        this.material = new THREE.MeshBasicMaterial({
+            color: color,
+            wireframe: debugMode,
+        });
         this.mesh = new THREE.Mesh(this.geometry, this.material);
-        this.mesh.isMyObject = true; // Important for
-
-        this.wireframe = new THREE.WireframeGeometry(this.geometry);
-        this.line = new THREE.LineSegments(this.wireframe);
-        this.line.material.depthTest = false;
-        this.line.material.opacity = 0.5;
-        this.line.material.transparent = true;
-        this.line.isMyObject = true;
-    }
-
-    // clear() {
-    //     try {
-    //         this.scene.traverse((object) => {
-    //             if (object.isCube) {
-    //                 this.scene.remove(object);
-    //             }
-    //         });
-    //     } catch (error) {
-    //         console.log("error occured while clearing the scene");
-    //     }
-    // }
-
-    generate() {
-        super.generate();
-        this.scene.add(this.line);
     }
 
     static getParams() {
