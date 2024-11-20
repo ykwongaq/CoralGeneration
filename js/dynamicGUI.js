@@ -11,7 +11,13 @@ class DynamicGUI {
             object: DynamicGUI.DEFAULT_OBJECT,
         };
         this.parameterFolder = null;
-        this.objectList = [Cube.NAME, Cylinder.NAME, FlatTree.NAME];
+        this.objectList = [
+            Cube.NAME,
+            Cylinder.NAME,
+            // CollisionTest.NAME,
+            FlatTree.NAME,
+            LSystemCoral.NAME,
+        ];
 
         // Debug Mode
         this.redColor = new THREE.Color().setHex(0xff0000);
@@ -78,6 +84,12 @@ class DynamicGUI {
             case FlatTree.NAME:
                 this.generateFlatTreeParameters();
                 break;
+            case LSystemCoral.NAME:
+                this.generateLSystemCoralParameters();
+                break;
+            // case CollisionTest.NAME:
+            //     this.generateCollisionTestParameters();
+            //     break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
         }
@@ -194,6 +206,28 @@ class DynamicGUI {
         });
     }
 
+    // generateCollisionTestParameters() {
+    //     const collisionTestParameters = CollisionTest.getParams();
+    //     this.fodler
+    //         .add(collisionTestParameters, "x", -10, 10)
+    //         .step(0.1)
+    //         .onChange(() => {
+    //             this.updateObject();
+    //         });
+    //     this.folder
+    //         .add(collisionTestParameters, "y", -10, 10)
+    //         .step(0.1)
+    //         .onChange(() => {
+    //             this.updateObject();
+    //         });
+    //     this.folder
+    //         .add(collisionTestParameters, "z", -10, 10)
+    //         .step(0.1)
+    //         .onChange(() => {
+    //             this.updateObject();
+    //         });
+    // }
+
     generateFlatTreeParameters() {
         const flatTreeParameters = FlatTree.getParams();
         this.folder
@@ -257,5 +291,66 @@ class DynamicGUI {
         this.folder.addColor(flatTreeParameters, "branchColor").onChange(() => {
             this.updateObject();
         });
+    }
+
+    generateLSystemCoralParameters() {
+        const lSystemCoralParameters = LSystemCoral.getParams();
+        this.folder
+            .add(lSystemCoralParameters, "iteration", 0, 10)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(lSystemCoralParameters, "rootThickness", 0.1, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(lSystemCoralParameters, "rootLength", 1, 10)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(lSystemCoralParameters, "branchThicknessScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(lSystemCoralParameters, "branchLengthScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(lSystemCoralParameters, "branchMaxAngle", 0, Math.PI)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .addColor(lSystemCoralParameters, "branchColor")
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(lSystemCoralParameters, "seed")
+            .name("Random Seed")
+            .listen();
+        this.folder
+            .add(
+                {
+                    regenerate: () => {
+                        lSystemCoralParameters.seed = Math.floor(
+                            RandomNumberGenerator.random() * 1000000
+                        );
+                        this.updateObject();
+                    },
+                },
+                "regenerate"
+            )
+            .name("Regenerate Seed");
     }
 }

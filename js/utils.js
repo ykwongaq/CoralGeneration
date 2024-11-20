@@ -23,4 +23,12 @@ class Utils {
     static getXVector() {
         return Utils.X.clone();
     }
+
+    static getRandomDirection() {
+        return new THREE.Vector3(
+            RandomNumberGenerator.seedRandom() * 2 - 1,
+            RandomNumberGenerator.seedRandom() * 2 - 1,
+            RandomNumberGenerator.seedRandom() * 2 - 1
+        ).normalize();
+    }
 }

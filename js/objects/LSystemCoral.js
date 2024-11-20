@@ -1,11 +1,11 @@
-class FlatTree extends MyObject {
+class LSystemCoral extends MyObject {
     static PARAMS = {
         iteration: 1,
         rootThickness: 0.1,
         rootLength: 2,
         branchThicknessScaler: 0.8,
         branchLengthScaler: 0.8,
-        branchAngle: Math.PI / 6,
+        branchMaxAngle: Math.PI / 12,
 
         branchRadioSegments: 8,
         branchHeightSegments: 1,
@@ -17,23 +17,27 @@ class FlatTree extends MyObject {
             g: 69,
             b: 19,
         },
+
+        seed: RandomNumberGenerator.getSeed(),
     };
 
-    static NAME = "FlatTree";
+    static NAME = "LSystemCoral";
 
     constructor(
         scene,
         debugMode = false,
         position = new THREE.Vector3(0, 0, 0),
         direction = Utils.getUpVector(),
-        iteration = FlatTree.PARAMS.iteration,
-        rootThickness = FlatTree.PARAMS.rootThickness,
-        rootLength = FlatTree.PARAMS.rootLength,
-        branchThicknessScaler = FlatTree.PARAMS.branchThicknessScaler,
-        branchLengthScaler = FlatTree.PARAMS.branchLengthScaler,
-        branchAngle = FlatTree.PARAMS.branchAngle
+        iteration = LSystemCoral.PARAMS.iteration,
+        rootThickness = LSystemCoral.PARAMS.rootThickness,
+        rootLength = LSystemCoral.PARAMS.rootLength,
+        branchThicknessScaler = LSystemCoral.PARAMS.branchThicknessScaler,
+        branchLengthScaler = LSystemCoral.PARAMS.branchLengthScaler,
+        branchMaxAngle = LSystemCoral.PARAMS.branchMaxAngle,
+        seed = LSystemCoral.PARAMS.seed
     ) {
         super(scene, debugMode);
+        RandomNumberGenerator.setSeed(seed);
         this.position = position;
         this.direction = direction;
         this.iteration = iteration;
@@ -41,13 +45,17 @@ class FlatTree extends MyObject {
         this.rootLength = rootLength;
         this.branchThicknessScaler = branchThicknessScaler;
         this.branchLengthScaler = branchLengthScaler;
-        this.branchAngle = branchAngle;
+        this.branchMaxAngle = branchMaxAngle;
 
         const axiom = "F";
         const rules = {
-            F: "F[+F][-F]",
+            F: [
+                { replacement: "FL", probability: 0.5 },
+                { replacement: "F[+F][+F]", probability: 0.3 },
+                { replacement: "F[+F][+F][+F]", probability: 0.2 },
+            ],
         };
-        const L_System = new LSystem(axiom, rules);
+        const L_System = new StochasticLSystem(axiom, rules);
         this.sentence = L_System.generate(this.iteration);
     }
 
@@ -117,7 +125,7 @@ class FlatTree extends MyObject {
         for (const char of this.sentence) {
             switch (char) {
                 case "F":
-                    const endPoint = this.createBranch(
+                    var endPoint = this.createBranch(
                         currentBranchCondition.getPosition(),
                         currentBranchCondition.getDirection(),
                         currentBranchCondition.getThickness(),
@@ -128,17 +136,41 @@ class FlatTree extends MyObject {
                     break;
                 case "+":
                     currentDirection = currentBranchCondition.getDirection();
+
+                    const randomAxis = Utils.getRandomDirection();
+                    const randomAngle =
+                        (RandomNumberGenerator.seedRandom() * 2 - 1) *
+                        this.branchMaxAngle;
+
                     newDirection = currentDirection
-                        .applyAxisAngle(Utils.Z, this.branchAngle)
+                        .applyAxisAngle(randomAxis, randomAngle)
                         .normalize();
+
                     currentBranchCondition.setDirection(newDirection);
                     break;
                 case "-":
-                    currentDirection = currentBranchCondition.getDirection();
-                    newDirection = currentDirection
-                        .applyAxisAngle(Utils.Z, -this.branchAngle)
-                        .normalize();
-                    currentBranchCondition.setDirection(newDirection);
+                    const lastRotation =
+                        currentBranchCondition.getLastRotation();
+                    if (lastRotation) {
+                        currentDirection =
+                            currentBranchCondition.getDirection();
+                        // Revert the rotation
+                        newDirection = currentDirection.applyAxisAngle(
+                            lastRotation.axis,
+                            -lastRotation.angle
+                        );
+                        currentBranchCondition.setDirection(newDirection);
+                    }
+                    break;
+                case "L":
+                    var endPoint = this.createBranch(
+                        currentBranchCondition.getPosition(),
+                        currentBranchCondition.getDirection(),
+                        currentBranchCondition.getThickness(),
+                        currentBranchCondition.getThickness(),
+                        currentBranchCondition.getLength() * 0.2
+                    );
+                    currentBranchCondition.setPosition(endPoint);
                     break;
                 case "[":
                     stack.push(currentBranchCondition.clone());
@@ -162,15 +194,18 @@ class FlatTree extends MyObject {
     }
 
     static getParams() {
-        return FlatTree.PARAMS;
+        return LSystemCoral.PARAMS;
     }
 
+    // Inner class
     BranchCondition = class {
-        constructor(position, direction, thickness, length) {
+        constructor(position, direction, thickness, length, color) {
             this.position = position;
             this.direction = direction;
             this.thickness = thickness;
             this.length = length;
+            this.color = color;
+            this.lastRotation = null; // Store the last random rotation
         }
 
         setPosition(position) {
@@ -189,6 +224,10 @@ class FlatTree extends MyObject {
             this.length = length;
         }
 
+        setColor(color) {
+            this.color = color;
+        }
+
         getPosition() {
             return this.position;
         }
@@ -205,13 +244,28 @@ class FlatTree extends MyObject {
             return this.length;
         }
 
+        getColor() {
+            return this.color;
+        }
+
+        setLastRotation(axis, angle) {
+            this.lastRotation = { axis, angle };
+        }
+
+        getLastRotation() {
+            return this.lastRotation;
+        }
+
         clone() {
-            return new this.constructor(
+            const clone = new this.constructor(
                 this.position.clone(),
                 this.direction.clone(),
                 this.thickness,
-                this.length
+                this.length,
+                this.color
             );
+            clone.lastRotation = this.lastRotation; // Clone the last rotation
+            return clone;
         }
     };
 }
