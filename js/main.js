@@ -49,17 +49,6 @@ function main() {
     const gui = new DynamicGUI(scene);
     gui.createGUI();
 
-    // // Create a cube
-    // const aximon = "F";
-    // const rules = {
-    //     F: "FF+[+F-F-F]-[-F+F+F]",
-    // };
-    // const l_system = new LSystem(aximon, rules);
-    // const rule = l_system.generate(3);
-
-    // const tree = new LSystemTree(scene, rule);
-    // tree.generate();
-
     // // Render Loop
     function animate() {
         controls.update();
