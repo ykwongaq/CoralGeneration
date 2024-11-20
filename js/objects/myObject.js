@@ -82,4 +82,8 @@ class MyObject {
         arrowHelper.isMyObject = true;
         return arrowHelper;
     }
+
+    isCollidingWith(object) {
+        throw new Error("isCollidingWith not implemented");
+    }
 }

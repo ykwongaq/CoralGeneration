@@ -1,5 +1,5 @@
 class RandomNumberGenerator {
-    static seed = Math.floor(Math.random() * 1000000);
+    static seed = 584446;
     static m = 0x80000000;
     static a = 1103515245;
     static c = 12345;

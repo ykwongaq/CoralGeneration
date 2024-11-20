@@ -14,7 +14,7 @@ class DynamicGUI {
         this.objectList = [
             Cube.NAME,
             Cylinder.NAME,
-            // CollisionTest.NAME,
+            CollisionTest.NAME,
             FlatTree.NAME,
             LSystemCoral.NAME,
         ];
@@ -87,9 +87,9 @@ class DynamicGUI {
             case LSystemCoral.NAME:
                 this.generateLSystemCoralParameters();
                 break;
-            // case CollisionTest.NAME:
-            //     this.generateCollisionTestParameters();
-            //     break;
+            case CollisionTest.NAME:
+                this.generateCollisionTestParameters();
+                break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
         }
@@ -206,27 +206,27 @@ class DynamicGUI {
         });
     }
 
-    // generateCollisionTestParameters() {
-    //     const collisionTestParameters = CollisionTest.getParams();
-    //     this.fodler
-    //         .add(collisionTestParameters, "x", -10, 10)
-    //         .step(0.1)
-    //         .onChange(() => {
-    //             this.updateObject();
-    //         });
-    //     this.folder
-    //         .add(collisionTestParameters, "y", -10, 10)
-    //         .step(0.1)
-    //         .onChange(() => {
-    //             this.updateObject();
-    //         });
-    //     this.folder
-    //         .add(collisionTestParameters, "z", -10, 10)
-    //         .step(0.1)
-    //         .onChange(() => {
-    //             this.updateObject();
-    //         });
-    // }
+    generateCollisionTestParameters() {
+        const collisionTestParameters = CollisionTest.getParams();
+        this.folder
+            .add(collisionTestParameters, "x", -10, 10)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(collisionTestParameters, "y", -10, 10)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(collisionTestParameters, "z", -10, 10)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+    }
 
     generateFlatTreeParameters() {
         const flatTreeParameters = FlatTree.getParams();
