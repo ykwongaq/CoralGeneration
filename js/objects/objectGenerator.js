@@ -29,9 +29,6 @@ class ObjectGenerator {
             case CollisionTest.NAME:
                 this.object = new CollisionTest(this.scene, this.debugMode);
                 break;
-            case CollisionTest.NAME:
-                this.object = new CollisionTest(this.scene, this.debugMode);
-                break;
             default:
                 throw new Error(`Object ${objectName} not found`);
         }
