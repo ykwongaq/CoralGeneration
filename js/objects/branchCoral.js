@@ -1,12 +1,15 @@
-class LSystemCoral extends MyObject {
+class BranchCoral extends MyObject {
     static PARAMS = {
+        // L-System Settings
         iteration: 1,
+        seed: RandomNumberGenerator.getSeed(),
+
+        // Branch Settings
         rootThickness: 0.1,
         rootLength: 2,
         branchThicknessScaler: 0.8,
         branchLengthScaler: 0.8,
         branchMaxAngle: Math.PI / 12,
-
         branchRadioSegments: 8,
         branchHeightSegments: 1,
         branchOpenEnded: false,
@@ -18,23 +21,27 @@ class LSystemCoral extends MyObject {
             b: 19,
         },
 
-        seed: RandomNumberGenerator.getSeed(),
+        // Center oriented
+        centerOriented: true,
+        centerDegree: 0.5,
     };
 
-    static NAME = "LSystemCoral";
+    static NAME = "BranchCoral";
 
     constructor(
         scene,
         debugMode = false,
         position = new THREE.Vector3(0, 0, 0),
         direction = Utils.getUpVector(),
-        iteration = LSystemCoral.PARAMS.iteration,
-        rootThickness = LSystemCoral.PARAMS.rootThickness,
-        rootLength = LSystemCoral.PARAMS.rootLength,
-        branchThicknessScaler = LSystemCoral.PARAMS.branchThicknessScaler,
-        branchLengthScaler = LSystemCoral.PARAMS.branchLengthScaler,
-        branchMaxAngle = LSystemCoral.PARAMS.branchMaxAngle,
-        seed = LSystemCoral.PARAMS.seed
+        iteration = BranchCoral.PARAMS.iteration,
+        rootThickness = BranchCoral.PARAMS.rootThickness,
+        rootLength = BranchCoral.PARAMS.rootLength,
+        branchThicknessScaler = BranchCoral.PARAMS.branchThicknessScaler,
+        branchLengthScaler = BranchCoral.PARAMS.branchLengthScaler,
+        branchMaxAngle = BranchCoral.PARAMS.branchMaxAngle,
+        seed = BranchCoral.PARAMS.seed,
+        centerOriented = BranchCoral.PARAMS.centerOriented,
+        centerDegree = BranchCoral.PARAMS.centerDegree
     ) {
         super(scene, debugMode);
         RandomNumberGenerator.setSeed(seed);
@@ -46,13 +53,17 @@ class LSystemCoral extends MyObject {
         this.branchThicknessScaler = branchThicknessScaler;
         this.branchLengthScaler = branchLengthScaler;
         this.branchMaxAngle = branchMaxAngle;
+        this.centerOriented = centerOriented;
+        this.centerDegree = centerDegree;
 
         const axiom = "F";
         const rules = {
             F: [
-                { replacement: "FL", probability: 0.5 },
-                { replacement: "F[+F][+F]", probability: 0.3 },
-                { replacement: "F[+F][+F][+F]", probability: 0.2 },
+                { replacement: "LF", probability: 0.3 },
+                { replacement: "F[+F][+F]", probability: 0.2 },
+                { replacement: "F[+F][+F][+F]", probability: 0.1 },
+                { replacement: "F[+F][+LF]", probability: 0.2 },
+                { replacement: "F[+F]", probability: 0.2 },
             ],
         };
         const L_System = new StochasticLSystem(axiom, rules);
@@ -65,12 +76,12 @@ class LSystemCoral extends MyObject {
         radiusTop,
         radiusBottom,
         height,
-        radialSegments = FlatTree.PARAMS.branchRadioSegments,
-        heightSegments = FlatTree.PARAMS.branchHeightSegments,
-        openEnded = FlatTree.PARAMS.branchOpenEnded,
-        thetaStart = FlatTree.PARAMS.branchThetaStart,
-        thetaLength = FlatTree.PARAMS.branchThetaLength,
-        color = FlatTree.PARAMS.branchColor
+        radialSegments = BranchCoral.PARAMS.branchRadioSegments,
+        heightSegments = BranchCoral.PARAMS.branchHeightSegments,
+        openEnded = BranchCoral.PARAMS.branchOpenEnded,
+        thetaStart = BranchCoral.PARAMS.branchThetaStart,
+        thetaLength = BranchCoral.PARAMS.branchThetaLength,
+        color = BranchCoral.PARAMS.branchColor
     ) {
         const branch = new Cylinder(
             this.scene,
@@ -110,6 +121,10 @@ class LSystemCoral extends MyObject {
         return endPoint;
     }
 
+    calProbability(i) {
+        return 1 - Math.exp(-this.centerDegree * i);
+    }
+
     generate() {
         const stack = [];
         let currentBranchCondition = new this.BranchCondition(
@@ -145,6 +160,32 @@ class LSystemCoral extends MyObject {
                     newDirection = currentDirection
                         .applyAxisAngle(randomAxis, randomAngle)
                         .normalize();
+
+                    if (this.centerOriented) {
+                        const p = this.calProbability(
+                            currentBranchCondition.getLayer()
+                        );
+                        const randomNumber = RandomNumberGenerator.seedRandom();
+
+                        if (randomNumber < p) {
+                            // Coral branches will tends to grow towards the center
+                            let alpha = Utils.dotProduct(
+                                Utils.getUpVector().normalize(),
+                                newDirection.clone()
+                            );
+                            alpha = Math.max(0, Math.min(1, alpha));
+
+                            const vector1 = Utils.getUpVector()
+                                .clone()
+                                .multiplyScalar(1 - alpha);
+                            const vector2 = newDirection
+                                .clone()
+                                .multiplyScalar(alpha);
+
+                            newDirection = vector1.add(vector2);
+                            newDirection.normalize();
+                        }
+                    }
 
                     currentBranchCondition.setDirection(newDirection);
                     break;
@@ -182,6 +223,9 @@ class LSystemCoral extends MyObject {
                         currentBranchCondition.getLength() *
                             this.branchLengthScaler
                     );
+                    currentBranchCondition.setLayer(
+                        currentBranchCondition.getLayer() + 1
+                    );
                     break;
                 case "]":
                     currentBranchCondition = stack.pop();
@@ -194,7 +238,7 @@ class LSystemCoral extends MyObject {
     }
 
     static getParams() {
-        return LSystemCoral.PARAMS;
+        return BranchCoral.PARAMS;
     }
 
     // Inner class
@@ -206,6 +250,7 @@ class LSystemCoral extends MyObject {
             this.length = length;
             this.color = color;
             this.lastRotation = null; // Store the last random rotation
+            this.layer = 0;
         }
 
         setPosition(position) {
@@ -214,6 +259,14 @@ class LSystemCoral extends MyObject {
 
         setDirection(direction) {
             this.direction = direction;
+        }
+
+        getLayer() {
+            return this.layer;
+        }
+
+        setLayer(layer) {
+            this.layer = layer;
         }
 
         setThickness(thickness) {

@@ -16,7 +16,8 @@ class DynamicGUI {
             Cylinder.NAME,
             CollisionTest.NAME,
             FlatTree.NAME,
-            LSystemCoral.NAME,
+            LSystemTree.NAME,
+            BranchCoral.NAME,
         ];
 
         // Debug Mode
@@ -24,6 +25,8 @@ class DynamicGUI {
         this.greenColor = new THREE.Color().setHex(0x00ff00);
         this.blueColor = new THREE.Color().setHex(0x0000ff);
         this.axesHelper = this.generateAxesHelper();
+
+        this.folders = [];
     }
 
     createGUI() {
@@ -69,11 +72,16 @@ class DynamicGUI {
     }
 
     updateFolder() {
-        if (this.folder) {
-            this.gui.removeFolder(this.folder);
+        if (this.folders.length > 0) {
+            // Remove all folders
+            this.folders.forEach((folder) => {
+                this.gui.removeFolder(folder);
+            });
+            this.folders = [];
         }
 
-        this.folder = this.gui.addFolder("Parameters");
+        this.folder = this.addFolder("Parameters");
+
         switch (this.params.object) {
             case Cube.NAME:
                 this.generateCubeParameters();
@@ -84,16 +92,22 @@ class DynamicGUI {
             case FlatTree.NAME:
                 this.generateFlatTreeParameters();
                 break;
-            case LSystemCoral.NAME:
-                this.generateLSystemCoralParameters();
+            case LSystemTree.NAME:
+                this.generateLSystemTreeParameters();
                 break;
             case CollisionTest.NAME:
                 this.generateCollisionTestParameters();
                 break;
+            case BranchCoral.NAME:
+                this.generateBranchCoralParameters();
+                break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
         }
-        this.folder.open();
+
+        for (let i = 0; i < this.folders.length; i++) {
+            this.folders[i].open();
+        }
     }
 
     generateAxesHelper() {
@@ -293,8 +307,14 @@ class DynamicGUI {
         });
     }
 
-    generateLSystemCoralParameters() {
-        const lSystemCoralParameters = LSystemCoral.getParams();
+    addFolder(name) {
+        const folder = this.gui.addFolder(name);
+        this.folders.push(folder);
+        return folder;
+    }
+
+    generateLSystemTreeParameters() {
+        const lSystemCoralParameters = LSystemTree.getParams();
         this.folder
             .add(lSystemCoralParameters, "iteration", 0, 10)
             .step(1)
@@ -352,5 +372,83 @@ class DynamicGUI {
                 "regenerate"
             )
             .name("Regenerate Seed");
+    }
+
+    generateBranchCoralParameters() {
+        const branchCoralParameters = BranchCoral.getParams();
+        this.folder
+            .add(branchCoralParameters, "iteration", 0, 8)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(branchCoralParameters, "seed")
+            .name("Random Seed")
+            .listen();
+        this.folder
+            .add(
+                {
+                    regenerate: () => {
+                        branchCoralParameters.seed = Math.floor(
+                            RandomNumberGenerator.random() * 1000000
+                        );
+                        this.updateObject();
+                    },
+                },
+                "regenerate"
+            )
+            .name("Regenerate Seed");
+
+        const centerSetting = this.addFolder("Center Orientation");
+        centerSetting
+            .add(branchCoralParameters, "centerOriented")
+            .name("Center Oriented")
+            .onChange(() => {
+                this.updateObject();
+            });
+        centerSetting
+            .add(branchCoralParameters, "centerDegree", 0, 1)
+            .step(0.01)
+            .name("Center Degree")
+            .onChange(() => {
+                this.updateObject();
+            });
+
+        const branchSetting = this.addFolder("Branch Setting");
+        branchSetting
+            .add(branchCoralParameters, "rootThickness", 0.1, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(branchCoralParameters, "rootLength", 1, 10)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(branchCoralParameters, "branchThicknessScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(branchCoralParameters, "branchLengthScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(branchCoralParameters, "branchMaxAngle", 0, Math.PI)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .addColor(branchCoralParameters, "branchColor")
+            .onChange(() => {
+                this.updateObject();
+            });
     }
 }

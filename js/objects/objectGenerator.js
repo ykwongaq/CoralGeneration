@@ -23,11 +23,14 @@ class ObjectGenerator {
             case FlatTree.NAME:
                 this.object = new FlatTree(this.scene, this.debugMode);
                 break;
-            case LSystemCoral.NAME:
-                this.object = new LSystemCoral(this.scene, this.debugMode);
+            case LSystemTree.NAME:
+                this.object = new LSystemTree(this.scene, this.debugMode);
                 break;
             case CollisionTest.NAME:
                 this.object = new CollisionTest(this.scene, this.debugMode);
+                break;
+            case BranchCoral.NAME:
+                this.object = new BranchCoral(this.scene, this.debugMode);
                 break;
             default:
                 throw new Error(`Object ${objectName} not found`);

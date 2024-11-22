@@ -1,175 +1,189 @@
-class BranchesCondition {
-    constructor(position, direction, thickness, length, color) {
-        this.position = position;
-        this.direction = direction;
-        this.thickness = thickness;
-        this.length = length;
-        this.color = color;
-    }
+class LSystemTree extends MyObject {
+    static PARAMS = {
+        iteration: 1,
+        rootThickness: 0.1,
+        rootLength: 2,
+        branchThicknessScaler: 0.8,
+        branchLengthScaler: 0.8,
+        branchMaxAngle: Math.PI / 12,
 
-    setPosition(position) {
-        this.position = position;
-    }
+        branchRadioSegments: 8,
+        branchHeightSegments: 1,
+        branchOpenEnded: false,
+        branchThetaStart: 0,
+        branchThetaLength: Math.PI * 2,
+        branchColor: {
+            r: 139,
+            g: 69,
+            b: 19,
+        },
 
-    setDirection(direction) {
-        this.direction = direction;
-    }
+        seed: RandomNumberGenerator.getSeed(),
+    };
 
-    setThickness(thickness) {
-        this.thickness = thickness;
-    }
-
-    setLength(length) {
-        this.length = length;
-    }
-
-    setColor(color) {
-        this.color = color;
-    }
-
-    getPosition() {
-        return this.position;
-    }
-
-    getDirection() {
-        return this.direction;
-    }
-
-    getThickness() {
-        return this.thickness;
-    }
-
-    getLength() {
-        return this.length;
-    }
-
-    getColor() {
-        return this.color;
-    }
-
-    clone() {
-        return new BranchesCondition(
-            this.position.clone(),
-            this.direction.clone(),
-            this.thickness,
-            this.length,
-            this.color
-        );
-    }
-}
-
-class LSystemTree {
-    static DEFAULT_POSITION = new THREE.Vector3(0, 0, 0);
-    static DEFAULT_DIRECTION = new THREE.Vector3(0, 1, 0);
-    static DEFAULT_THICKNESS = 0.1;
-    static DEFUALT_ITERATIONS = 3;
-    static DEFAULT_LENGTH = 1;
-    static DEFAULT_COLOR = 0x8b4513;
-    static DEFAULT_LENGHT_SCALER = 0.8;
-    static DEFAULT_THICKNESS_SCALER = 0.8;
-    static DEFAUTL_BRANCH_ANGLE = Math.PI / 6;
+    static NAME = "LSystemTree";
 
     constructor(
         scene,
-        axiom,
-        position = LSystemTree.DEFAULT_POSITION,
-        direction = LSystemTree.DEFAULT_DIRECTION,
-        thickness = LSystemTree.DEFAULT_THICKNESS,
-        length = LSystemTree.DEFAULT_LENGTH,
-        color = LSystemTree.DEFAULT_COLOR,
-        lengthScaler = LSystemTree.DEFAULT_LENGHT_SCALER,
-        thicknessScaler = LSystemTree.DEFAULT_THICKNESS_SCALER,
-        branchAngle = LSystemTree.DEFAUTL_BRANCH_ANGLE
+        debugMode = false,
+        position = new THREE.Vector3(0, 0, 0),
+        direction = Utils.getUpVector(),
+        iteration = LSystemTree.PARAMS.iteration,
+        rootThickness = LSystemTree.PARAMS.rootThickness,
+        rootLength = LSystemTree.PARAMS.rootLength,
+        branchThicknessScaler = LSystemTree.PARAMS.branchThicknessScaler,
+        branchLengthScaler = LSystemTree.PARAMS.branchLengthScaler,
+        branchMaxAngle = LSystemTree.PARAMS.branchMaxAngle,
+        seed = LSystemTree.PARAMS.seed
     ) {
-        this.scene = scene;
-        this.axiom = axiom;
+        super(scene, debugMode);
+        RandomNumberGenerator.setSeed(seed);
         this.position = position;
         this.direction = direction;
-        this.thickness = thickness;
-        this.length = length;
-        this.color = color;
-        this.lengthScaler = lengthScaler;
-        this.thicknessScaler = thicknessScaler;
-        this.branchAngle = branchAngle;
+        this.iteration = iteration;
+        this.rootThickness = rootThickness;
+        this.rootLength = rootLength;
+        this.branchThicknessScaler = branchThicknessScaler;
+        this.branchLengthScaler = branchLengthScaler;
+        this.branchMaxAngle = branchMaxAngle;
+
+        const axiom = "F";
+        const rules = {
+            F: [
+                { replacement: "LF", probability: 0.3 },
+                { replacement: "F[+F][+F]", probability: 0.2 },
+                { replacement: "F[+F][+F][+F]", probability: 0.1 },
+                { replacement: "F[+L+F][+L+F]", probability: 0.2 },
+                { replacement: "F[+F]", probability: 0.2 },
+            ],
+        };
+        const L_System = new StochasticLSystem(axiom, rules);
+        this.sentence = L_System.generate(this.iteration);
     }
 
-    genCylinder(topRadius, bottomRadius, height, color) {
-        const geometry = new THREE.CylinderGeometry(
-            topRadius,
-            bottomRadius,
-            height
+    createBranch(
+        position,
+        direction,
+        radiusTop,
+        radiusBottom,
+        height,
+        radialSegments = LSystemTree.PARAMS.branchRadioSegments,
+        heightSegments = LSystemTree.PARAMS.branchHeightSegments,
+        openEnded = LSystemTree.PARAMS.branchOpenEnded,
+        thetaStart = LSystemTree.PARAMS.branchThetaStart,
+        thetaLength = LSystemTree.PARAMS.branchThetaLength,
+        color = LSystemTree.PARAMS.branchColor
+    ) {
+        const branch = new Cylinder(
+            this.scene,
+            this.debugMode,
+            radiusTop,
+            radiusBottom,
+            height,
+            radialSegments,
+            heightSegments,
+            openEnded,
+            thetaStart,
+            thetaLength,
+            color
         );
-        const material = new THREE.MeshBasicMaterial({ color });
-        return new THREE.Mesh(geometry, material);
-    }
+        let currentDirection = new THREE.Vector3(0, 0, 0);
+        branch.mesh.getWorldDirection(currentDirection);
+        currentDirection.normalize();
 
-    createBranch(position, direction, thickness, length, color) {
-        const cylinder = this.genCylinder(thickness, thickness, length, color);
+        const quaternion = new THREE.Quaternion();
+        quaternion.setFromUnitVectors(
+            Utils.getUpVector(),
+            direction.clone().normalize()
+        );
+        branch.mesh.applyQuaternion(quaternion);
 
-        // Rotate the cylinder to align with the direction vector
-        if (!direction.equals(Utils.UP)) {
-            const axis = new THREE.Vector3()
-                .crossVectors(Utils.UP, direction)
-                .normalize();
-            const angle = Math.acos(
-                Utils.UP.dot(direction) / Utils.UP.length() / direction.length()
-            );
-            const matrix = new THREE.Matrix4().makeRotationAxis(axis, angle);
-            cylinder.applyMatrix4(matrix);
-        }
-
-        // Position the cylinder
-        cylinder.position.copy(
-            position.clone().add(direction.clone().multiplyScalar(length / 2))
+        // console.log("currentDir: ", currentDirection);
+        branch.mesh.position.copy(
+            position.clone().add(direction.clone().multiplyScalar(height / 2))
         );
 
-        this.scene.add(cylinder);
-
-        return position.clone().add(direction.clone().multiplyScalar(length));
+        // const meshCenter = branch.mesh.position.clone();
+        const endPoint = new THREE.Vector3().addVectors(
+            position,
+            direction.clone().multiplyScalar(height)
+        );
+        branch.generate();
+        return endPoint;
     }
 
     generate() {
         const stack = [];
-        let currentBranchCondition = new BranchesCondition(
+        let currentBranchCondition = new this.BranchCondition(
             this.position,
             this.direction,
-            this.thickness,
-            this.length,
-            this.color
+            this.rootThickness,
+            this.rootLength
         );
 
         let currentDirection;
         let newDirection;
 
-        for (const char of this.axiom) {
+        for (const char of this.sentence) {
             switch (char) {
                 case "F":
-                    currentBranchCondition.position = this.createBranch(
+                    var endPoint = this.createBranch(
                         currentBranchCondition.getPosition(),
                         currentBranchCondition.getDirection(),
                         currentBranchCondition.getThickness(),
-                        currentBranchCondition.getLength(),
-                        currentBranchCondition.getColor()
+                        currentBranchCondition.getThickness(),
+                        currentBranchCondition.getLength()
                     );
+                    currentBranchCondition.setPosition(endPoint);
                     break;
                 case "+":
                     currentDirection = currentBranchCondition.getDirection();
-                    newDirection = currentDirection.applyAxisAngle(
-                        Utils.Z,
-                        this.branchAngle
-                    );
+
+                    const randomAxis = Utils.getRandomDirection();
+                    const randomAngle =
+                        (RandomNumberGenerator.seedRandom() * 2 - 1) *
+                        this.branchMaxAngle;
+
+                    newDirection = currentDirection
+                        .applyAxisAngle(randomAxis, randomAngle)
+                        .normalize();
+
                     currentBranchCondition.setDirection(newDirection);
                     break;
                 case "-":
-                    currentDirection = currentBranchCondition.getDirection();
-                    newDirection = currentDirection.applyAxisAngle(
-                        Utils.Z,
-                        -this.branchAngle
+                    const lastRotation =
+                        currentBranchCondition.getLastRotation();
+                    if (lastRotation) {
+                        currentDirection =
+                            currentBranchCondition.getDirection();
+                        // Revert the rotation
+                        newDirection = currentDirection.applyAxisAngle(
+                            lastRotation.axis,
+                            -lastRotation.angle
+                        );
+                        currentBranchCondition.setDirection(newDirection);
+                    }
+                    break;
+                case "L":
+                    var endPoint = this.createBranch(
+                        currentBranchCondition.getPosition(),
+                        currentBranchCondition.getDirection(),
+                        currentBranchCondition.getThickness(),
+                        currentBranchCondition.getThickness(),
+                        currentBranchCondition.getLength() * 0.2
                     );
-                    currentBranchCondition.setDirection(newDirection);
+                    currentBranchCondition.setPosition(endPoint);
                     break;
                 case "[":
                     stack.push(currentBranchCondition.clone());
+                    currentBranchCondition.setThickness(
+                        currentBranchCondition.getThickness() *
+                            this.branchThicknessScaler
+                    );
+                    currentBranchCondition.setLength(
+                        currentBranchCondition.getLength() *
+                            this.branchLengthScaler
+                    );
                     break;
                 case "]":
                     currentBranchCondition = stack.pop();
@@ -180,4 +194,80 @@ class LSystemTree {
             }
         }
     }
+
+    static getParams() {
+        return LSystemTree.PARAMS;
+    }
+
+    // Inner class
+    BranchCondition = class {
+        constructor(position, direction, thickness, length, color) {
+            this.position = position;
+            this.direction = direction;
+            this.thickness = thickness;
+            this.length = length;
+            this.color = color;
+            this.lastRotation = null; // Store the last random rotation
+        }
+
+        setPosition(position) {
+            this.position = position;
+        }
+
+        setDirection(direction) {
+            this.direction = direction;
+        }
+
+        setThickness(thickness) {
+            this.thickness = thickness;
+        }
+
+        setLength(length) {
+            this.length = length;
+        }
+
+        setColor(color) {
+            this.color = color;
+        }
+
+        getPosition() {
+            return this.position;
+        }
+
+        getDirection() {
+            return this.direction;
+        }
+
+        getThickness() {
+            return this.thickness;
+        }
+
+        getLength() {
+            return this.length;
+        }
+
+        getColor() {
+            return this.color;
+        }
+
+        setLastRotation(axis, angle) {
+            this.lastRotation = { axis, angle };
+        }
+
+        getLastRotation() {
+            return this.lastRotation;
+        }
+
+        clone() {
+            const clone = new this.constructor(
+                this.position.clone(),
+                this.direction.clone(),
+                this.thickness,
+                this.length,
+                this.color
+            );
+            clone.lastRotation = this.lastRotation; // Clone the last rotation
+            return clone;
+        }
+    };
 }
