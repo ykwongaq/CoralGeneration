@@ -35,4 +35,12 @@ class Utils {
     static dotProduct(v1, v2) {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
+
+    static deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+
+    static rad2deg(rad) {
+        return rad * (180 / Math.PI);
+    }
 }

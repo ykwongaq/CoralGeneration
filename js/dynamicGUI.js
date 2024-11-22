@@ -240,6 +240,24 @@ class DynamicGUI {
             .onChange(() => {
                 this.updateObject();
             });
+        this.folder
+            .add(collisionTestParameters, "rotateX", 0, 360)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(collisionTestParameters, "rotateY", 0, 360)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(collisionTestParameters, "rotateZ", 0, 360)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
     }
 
     generateFlatTreeParameters() {

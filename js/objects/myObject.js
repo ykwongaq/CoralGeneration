@@ -83,7 +83,33 @@ class MyObject {
         return arrowHelper;
     }
 
+    getBBox() {
+        this.mesh.updateMatrixWorld(true);
+        this.mesh.geometry.computeBoundingBox();
+
+        const worldMatrix = this.mesh.matrixWorld;
+        const positionAttribute = this.mesh.geometry.attributes.position;
+        let min = new THREE.Vector3(Infinity, Infinity, Infinity);
+        let max = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
+
+        for (let i = 0; i < positionAttribute.count; i++) {
+            const vertex = new THREE.Vector3().fromBufferAttribute(
+                positionAttribute,
+                i
+            );
+            vertex.applyMatrix4(worldMatrix);
+
+            min.min(vertex);
+            max.max(vertex);
+        }
+
+        const bbox = new THREE.Box3(min, max);
+        return bbox;
+    }
+
     isCollidingWith(object) {
-        throw new Error("isCollidingWith not implemented");
+        const bbox1 = this.getBBox();
+        const bbox2 = object.getBBox();
+        return bbox1.intersectsBox(bbox2);
     }
 }
