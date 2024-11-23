@@ -1,11 +1,17 @@
-class LSystemTree extends MyObject {
+import * as THREE from "three";
+import MyObject from "./myObject";
+import Utils from "../utils";
+import Cylinder from "./cylinder";
+import LSystem from "../LSystem/lSystem";
+
+export default class FlatTree extends MyObject {
     static PARAMS = {
         iteration: 1,
         rootThickness: 0.1,
         rootLength: 2,
         branchThicknessScaler: 0.8,
         branchLengthScaler: 0.8,
-        branchMaxAngle: Math.PI / 12,
+        branchAngle: Math.PI / 6,
 
         branchRadioSegments: 8,
         branchHeightSegments: 1,
@@ -17,27 +23,23 @@ class LSystemTree extends MyObject {
             g: 69,
             b: 19,
         },
-
-        seed: RandomNumberGenerator.getSeed(),
     };
 
-    static NAME = "LSystemTree";
+    static NAME = "FlatTree";
 
     constructor(
         scene,
         debugMode = false,
         position = new THREE.Vector3(0, 0, 0),
         direction = Utils.getUpVector(),
-        iteration = LSystemTree.PARAMS.iteration,
-        rootThickness = LSystemTree.PARAMS.rootThickness,
-        rootLength = LSystemTree.PARAMS.rootLength,
-        branchThicknessScaler = LSystemTree.PARAMS.branchThicknessScaler,
-        branchLengthScaler = LSystemTree.PARAMS.branchLengthScaler,
-        branchMaxAngle = LSystemTree.PARAMS.branchMaxAngle,
-        seed = LSystemTree.PARAMS.seed
+        iteration = FlatTree.PARAMS.iteration,
+        rootThickness = FlatTree.PARAMS.rootThickness,
+        rootLength = FlatTree.PARAMS.rootLength,
+        branchThicknessScaler = FlatTree.PARAMS.branchThicknessScaler,
+        branchLengthScaler = FlatTree.PARAMS.branchLengthScaler,
+        branchAngle = FlatTree.PARAMS.branchAngle
     ) {
         super(scene, debugMode);
-        RandomNumberGenerator.setSeed(seed);
         this.position = position;
         this.direction = direction;
         this.iteration = iteration;
@@ -45,19 +47,13 @@ class LSystemTree extends MyObject {
         this.rootLength = rootLength;
         this.branchThicknessScaler = branchThicknessScaler;
         this.branchLengthScaler = branchLengthScaler;
-        this.branchMaxAngle = branchMaxAngle;
+        this.branchAngle = branchAngle;
 
         const axiom = "F";
         const rules = {
-            F: [
-                { replacement: "LF", probability: 0.3 },
-                { replacement: "F[+F][+F]", probability: 0.2 },
-                { replacement: "F[+F][+F][+F]", probability: 0.1 },
-                { replacement: "F[+L+F][+L+F]", probability: 0.2 },
-                { replacement: "F[+F]", probability: 0.2 },
-            ],
+            F: "F[+F][-F]",
         };
-        const L_System = new StochasticLSystem(axiom, rules);
+        const L_System = new LSystem(axiom, rules);
         this.sentence = L_System.generate(this.iteration);
     }
 
@@ -67,12 +63,12 @@ class LSystemTree extends MyObject {
         radiusTop,
         radiusBottom,
         height,
-        radialSegments = LSystemTree.PARAMS.branchRadioSegments,
-        heightSegments = LSystemTree.PARAMS.branchHeightSegments,
-        openEnded = LSystemTree.PARAMS.branchOpenEnded,
-        thetaStart = LSystemTree.PARAMS.branchThetaStart,
-        thetaLength = LSystemTree.PARAMS.branchThetaLength,
-        color = LSystemTree.PARAMS.branchColor
+        radialSegments = FlatTree.PARAMS.branchRadioSegments,
+        heightSegments = FlatTree.PARAMS.branchHeightSegments,
+        openEnded = FlatTree.PARAMS.branchOpenEnded,
+        thetaStart = FlatTree.PARAMS.branchThetaStart,
+        thetaLength = FlatTree.PARAMS.branchThetaLength,
+        color = FlatTree.PARAMS.branchColor
     ) {
         const branch = new Cylinder(
             this.scene,
@@ -127,7 +123,7 @@ class LSystemTree extends MyObject {
         for (const char of this.sentence) {
             switch (char) {
                 case "F":
-                    var endPoint = this.createBranch(
+                    const endPoint = this.createBranch(
                         currentBranchCondition.getPosition(),
                         currentBranchCondition.getDirection(),
                         currentBranchCondition.getThickness(),
@@ -138,41 +134,17 @@ class LSystemTree extends MyObject {
                     break;
                 case "+":
                     currentDirection = currentBranchCondition.getDirection();
-
-                    const randomAxis = Utils.getRandomDirection();
-                    const randomAngle =
-                        (RandomNumberGenerator.seedRandom() * 2 - 1) *
-                        this.branchMaxAngle;
-
                     newDirection = currentDirection
-                        .applyAxisAngle(randomAxis, randomAngle)
+                        .applyAxisAngle(Utils.Z, this.branchAngle)
                         .normalize();
-
                     currentBranchCondition.setDirection(newDirection);
                     break;
                 case "-":
-                    const lastRotation =
-                        currentBranchCondition.getLastRotation();
-                    if (lastRotation) {
-                        currentDirection =
-                            currentBranchCondition.getDirection();
-                        // Revert the rotation
-                        newDirection = currentDirection.applyAxisAngle(
-                            lastRotation.axis,
-                            -lastRotation.angle
-                        );
-                        currentBranchCondition.setDirection(newDirection);
-                    }
-                    break;
-                case "L":
-                    var endPoint = this.createBranch(
-                        currentBranchCondition.getPosition(),
-                        currentBranchCondition.getDirection(),
-                        currentBranchCondition.getThickness(),
-                        currentBranchCondition.getThickness(),
-                        currentBranchCondition.getLength() * 0.2
-                    );
-                    currentBranchCondition.setPosition(endPoint);
+                    currentDirection = currentBranchCondition.getDirection();
+                    newDirection = currentDirection
+                        .applyAxisAngle(Utils.Z, -this.branchAngle)
+                        .normalize();
+                    currentBranchCondition.setDirection(newDirection);
                     break;
                 case "[":
                     stack.push(currentBranchCondition.clone());
@@ -196,18 +168,15 @@ class LSystemTree extends MyObject {
     }
 
     static getParams() {
-        return LSystemTree.PARAMS;
+        return FlatTree.PARAMS;
     }
 
-    // Inner class
     BranchCondition = class {
-        constructor(position, direction, thickness, length, color) {
+        constructor(position, direction, thickness, length) {
             this.position = position;
             this.direction = direction;
             this.thickness = thickness;
             this.length = length;
-            this.color = color;
-            this.lastRotation = null; // Store the last random rotation
         }
 
         setPosition(position) {
@@ -226,10 +195,6 @@ class LSystemTree extends MyObject {
             this.length = length;
         }
 
-        setColor(color) {
-            this.color = color;
-        }
-
         getPosition() {
             return this.position;
         }
@@ -246,28 +211,13 @@ class LSystemTree extends MyObject {
             return this.length;
         }
 
-        getColor() {
-            return this.color;
-        }
-
-        setLastRotation(axis, angle) {
-            this.lastRotation = { axis, angle };
-        }
-
-        getLastRotation() {
-            return this.lastRotation;
-        }
-
         clone() {
-            const clone = new this.constructor(
+            return new this.constructor(
                 this.position.clone(),
                 this.direction.clone(),
                 this.thickness,
-                this.length,
-                this.color
+                this.length
             );
-            clone.lastRotation = this.lastRotation; // Clone the last rotation
-            return clone;
         }
     };
 }

@@ -1,4 +1,6 @@
-class StochasticLSystem {
+import RandomNumberGenerator from "../randomNumberGenerator";
+
+export default class StochasticLSystem {
     constructor(axiom, rules) {
         /*
             Example:

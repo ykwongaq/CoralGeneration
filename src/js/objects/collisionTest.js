@@ -1,4 +1,9 @@
-class CollisionTest extends MyObject {
+import * as THREE from "three";
+import MyObject from "./myObject";
+import Utils from "../utils";
+import Cylinder from "./cylinder";
+
+export default class CollisionTest extends MyObject {
     static PARAMS = {
         x: 0,
         y: 5,

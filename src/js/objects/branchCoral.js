@@ -1,4 +1,8 @@
-class BranchCoral extends MyObject {
+import * as THREE from "three";
+import MyObject from "./myObject";
+import RandomNumberGenerator from "../randomNumberGenerator";
+
+export default class BranchCoral extends MyObject {
     static PARAMS = {
         // L-System Settings
         iteration: 1,

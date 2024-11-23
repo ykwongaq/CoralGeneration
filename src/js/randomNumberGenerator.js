@@ -1,4 +1,4 @@
-class RandomNumberGenerator {
+export default class RandomNumberGenerator {
     static seed = 584446;
     static m = 0x80000000;
     static a = 1103515245;
