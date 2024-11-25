@@ -4,7 +4,8 @@ import FlatTree from "./flatTree.js";
 import LSystemTree from "./lSystemTree.js";
 import CollisionTest from "./collisionTest.js";
 import BranchCoral from "./branchCoral.js";
-import CurveTest from "./curveTest.js";
+import Curve from "./curve.js";
+import BranchCoralCurve from "./branchCoralCurve.js";
 
 export default class ObjectGenerator {
     constructor(scene) {
@@ -40,8 +41,11 @@ export default class ObjectGenerator {
             case BranchCoral.NAME:
                 this.object = new BranchCoral(this.scene, this.debugMode);
                 break;
-            case CurveTest.NAME:
-                this.object = new CurveTest(this.scene, this.debugMode);
+            case Curve.NAME:
+                this.object = new Curve(this.scene, this.debugMode);
+                break;
+            case BranchCoralCurve.NAME:
+                this.object = new BranchCoralCurve(this.scene, this.debugMode);
                 break;
             default:
                 throw new Error(`Object ${objectName} not found`);

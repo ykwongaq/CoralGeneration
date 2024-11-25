@@ -7,7 +7,8 @@ import LSystemTree from "./objects/lSystemTree";
 import BranchCoral from "./objects/branchCoral";
 import ObjectGenerator from "./objects/objectGenerator";
 import RandomNumberGenerator from "./randomNumberGenerator";
-import CurveTest from "./objects/curveTest";
+import Curve from "./objects/curve";
+import BranchCoralCurve from "./objects/branchCoralCurve";
 import { GUI } from "dat.gui";
 
 export default class DynamicGUI {
@@ -30,7 +31,8 @@ export default class DynamicGUI {
             FlatTree.NAME,
             LSystemTree.NAME,
             BranchCoral.NAME,
-            CurveTest.NAME,
+            Curve.NAME,
+            BranchCoralCurve.NAME,
         ];
 
         // Debug Mode
@@ -114,8 +116,11 @@ export default class DynamicGUI {
             case BranchCoral.NAME:
                 this.generateBranchCoralParameters();
                 break;
-            case CurveTest.NAME:
-                this.generateCurveTestParameters();
+            case Curve.NAME:
+                this.generateCurveParameters();
+                break;
+            case BranchCoralCurve.NAME:
+                this.generateBranchCoralCurveParameters();
                 break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
@@ -486,32 +491,35 @@ export default class DynamicGUI {
             });
     }
 
-    generateCurveTestParameters() {
-        const curveTestParameters = CurveTest.getParams();
+    generateCurveParameters() {
+        const curveParameters = Curve.getParams();
 
-        const curveTypes = [CurveTest.CATNULL_ROM, CurveTest.BSPLINE];
+        const curveTypes = [Curve.CATNULL_ROM, Curve.BSPLINE];
         this.folder
-            .add(curveTestParameters, "curveType", curveTypes)
+            .add(curveParameters, "curveType", curveTypes)
             .name("Curve Type")
             .onChange(() => {
                 this.updateObject();
             });
+        this.folder.addColor(curveParameters, "color").onChange(() => {
+            this.updateObject();
+        });
 
         const controlPoint1Folder = this.addFolder("Control Point 1");
         controlPoint1Folder
-            .add(curveTestParameters, "controlPoint1X", -10, 10)
+            .add(curveParameters, "controlPoint1X", -10, 10)
             .step(0.1)
             .onChange(() => {
                 this.updateObject();
             });
         controlPoint1Folder
-            .add(curveTestParameters, "controlPoint1Y", -10, 10)
+            .add(curveParameters, "controlPoint1Y", -10, 10)
             .step(0.1)
             .onChange(() => {
                 this.updateObject();
             });
         controlPoint1Folder
-            .add(curveTestParameters, "controlPoint1Z", -10, 10)
+            .add(curveParameters, "controlPoint1Z", -10, 10)
             .step(0.1)
             .onChange(() => {
                 this.updateObject();
@@ -519,19 +527,19 @@ export default class DynamicGUI {
 
         const controlPoint2Folder = this.addFolder("Control Point 2");
         controlPoint2Folder
-            .add(curveTestParameters, "controlPoint2X", -10, 10)
+            .add(curveParameters, "controlPoint2X", -10, 10)
             .step(0.1)
             .onChange(() => {
                 this.updateObject();
             });
         controlPoint2Folder
-            .add(curveTestParameters, "controlPoint2Y", -10, 10)
+            .add(curveParameters, "controlPoint2Y", -10, 10)
             .step(0.1)
             .onChange(() => {
                 this.updateObject();
             });
         controlPoint2Folder
-            .add(curveTestParameters, "controlPoint2Z", -10, 10)
+            .add(curveParameters, "controlPoint2Z", -10, 10)
             .step(0.1)
             .onChange(() => {
                 this.updateObject();
@@ -539,14 +547,92 @@ export default class DynamicGUI {
 
         const widthFolder = this.addFolder("Width");
         widthFolder
-            .add(curveTestParameters, "startWidth", 1, 30)
+            .add(curveParameters, "startWidth", 1, 30)
             .step(1)
             .onChange(() => {
                 this.updateObject();
             });
         widthFolder
-            .add(curveTestParameters, "endWidth", 1, 30)
+            .add(curveParameters, "endWidth", 1, 30)
             .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+    }
+
+    generateBranchCoralCurveParameters() {
+        const branchCoralCurveParameters = BranchCoralCurve.getParams();
+        this.folder
+            .add(branchCoralCurveParameters, "iteration", 0, 8)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(branchCoralCurveParameters, "seed")
+            .name("Random Seed")
+            .listen();
+        this.folder
+            .add(
+                {
+                    regenerate: () => {
+                        branchCoralCurveParameters.seed = Math.floor(
+                            RandomNumberGenerator.random() * 1000000
+                        );
+                        this.updateObject();
+                    },
+                },
+                "regenerate"
+            )
+            .name("Regenerate Seed");
+
+        const centerSetting = this.addFolder("Center Orientation");
+        centerSetting
+            .add(branchCoralCurveParameters, "centerOriented")
+            .name("Center Oriented")
+            .onChange(() => {
+                this.updateObject();
+            });
+        centerSetting
+            .add(branchCoralCurveParameters, "centerDegree", 0, 1)
+            .step(0.01)
+            .name("Center Degree")
+            .onChange(() => {
+                this.updateObject();
+            });
+
+        const branchSetting = this.addFolder("Branch Setting");
+        branchSetting
+            .add(branchCoralCurveParameters, "rootThickness", 4, 30)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(branchCoralCurveParameters, "rootLength", 1, 10)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(branchCoralCurveParameters, "branchThicknessScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(branchCoralCurveParameters, "branchLengthScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(branchCoralCurveParameters, "branchMaxAngle", 0, Math.PI)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .addColor(branchCoralCurveParameters, "branchColor")
             .onChange(() => {
                 this.updateObject();
             });

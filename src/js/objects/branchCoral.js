@@ -1,6 +1,9 @@
 import * as THREE from "three";
 import MyObject from "./myObject";
 import RandomNumberGenerator from "../randomNumberGenerator";
+import StochasticLSystem from "../LSystem/stochasticLSystem";
+import Utils from "../utils";
+import Cylinder from "./cylinder";
 
 export default class BranchCoral extends MyObject {
     static PARAMS = {
@@ -247,14 +250,14 @@ export default class BranchCoral extends MyObject {
 
     // Inner class
     BranchCondition = class {
-        constructor(position, direction, thickness, length, color) {
+        constructor(position, direction, thickness, length, color, layer = 0) {
             this.position = position;
             this.direction = direction;
             this.thickness = thickness;
             this.length = length;
             this.color = color;
             this.lastRotation = null; // Store the last random rotation
-            this.layer = 0;
+            this.layer = layer;
         }
 
         setPosition(position) {
@@ -319,7 +322,8 @@ export default class BranchCoral extends MyObject {
                 this.direction.clone(),
                 this.thickness,
                 this.length,
-                this.color
+                this.color,
+                this.layer
             );
             clone.lastRotation = this.lastRotation; // Clone the last rotation
             return clone;

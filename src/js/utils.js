@@ -46,4 +46,12 @@ export default class Utils {
     static rad2deg(rad) {
         return rad * (180 / Math.PI);
     }
+
+    static isVectorEqual(v1, v2, tolerance = 0.0001) {
+        return (
+            Math.abs(v1.x - v2.x) < tolerance &&
+            Math.abs(v1.y - v2.y) < tolerance &&
+            Math.abs(v1.z - v2.z) < tolerance
+        );
+    }
 }
