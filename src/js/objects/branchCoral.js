@@ -8,7 +8,7 @@ import Cylinder from "./cylinder";
 export default class BranchCoral extends MyObject {
     static PARAMS = {
         // L-System Settings
-        iteration: 1,
+        iteration: 2,
         seed: RandomNumberGenerator.getSeed(),
 
         // Branch Settings
