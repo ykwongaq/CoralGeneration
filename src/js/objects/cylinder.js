@@ -46,10 +46,11 @@ export default class Cylinder extends MyObject {
             thetaLength
         );
 
-
         var textureLoader = new THREE.TextureLoader();
-        var materials = new THREE.MeshBasicMaterial({map: textureLoader.load("./static/coral4.jpg")});
-        
+        var materials = new THREE.MeshBasicMaterial({
+            map: textureLoader.load("./static/coral4.jpg"),
+        });
+
         // const bumpMapMaterial = new THREE.MeshPhongMaterial()
         // const texture = new THREE.TextureLoader().load('./static/11299-bump.jpg')
         // material.map = texture

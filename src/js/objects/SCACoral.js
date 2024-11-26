@@ -21,7 +21,7 @@ export default class SCACoral extends MyAnimateObject {
 
         // Node
         segmentLength: 1,
-        basicThickness: 1,
+        basicThickness: 5,
         canalizeThickness: 0.01,
         maxThickness: 20,
         color: {

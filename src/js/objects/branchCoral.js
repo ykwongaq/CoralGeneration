@@ -8,15 +8,15 @@ import Cylinder from "./cylinder";
 export default class BranchCoral extends MyObject {
     static PARAMS = {
         // L-System Settings
-        iteration: 2,
-        seed: RandomNumberGenerator.getSeed(),
+        iteration: 6,
+        seed: 310109,
 
         // Branch Settings
         rootThickness: 0.1,
         rootLength: 2,
         branchThicknessScaler: 0.8,
         branchLengthScaler: 0.8,
-        branchMaxAngle: Math.PI / 12,
+        branchMaxAngle: Math.PI / 3,
         branchRadioSegments: 8,
         branchHeightSegments: 1,
         branchOpenEnded: false,
@@ -63,18 +63,18 @@ export default class BranchCoral extends MyObject {
         this.centerOriented = centerOriented;
         this.centerDegree = centerDegree;
 
-        const axiom = "F";
+        const axiom = "L[+F][+F]";
         const rules = {
             F: [
-                { replacement: "LF", probability: 0.3 },
-                { replacement: "F[+F][+F]", probability: 0.2 },
-                { replacement: "F[+F][+F][+F]", probability: 0.1 },
-                { replacement: "F[+F][+LF]", probability: 0.2 },
-                { replacement: "F[+F]", probability: 0.2 },
+                { replacement: "-F+F", probability: 0.5 },
+                { replacement: "L[+F][+F]", probability: 0.4 },
+                { replacement: "L[+F][+F][+F]", probability: 0.1 },
             ],
         };
         const L_System = new StochasticLSystem(axiom, rules);
         this.sentence = L_System.generate(this.iteration);
+
+        this.maxHeight = 10;
     }
 
     createBranch(
@@ -90,6 +90,13 @@ export default class BranchCoral extends MyObject {
         thetaLength = BranchCoral.PARAMS.branchThetaLength,
         color = BranchCoral.PARAMS.branchColor
     ) {
+        if (position == null) {
+            return null;
+        }
+
+        if (position.y > this.maxHeight) {
+            return null;
+        }
         const branch = new Cylinder(
             this.scene,
             this.debugMode,
@@ -159,8 +166,8 @@ export default class BranchCoral extends MyObject {
                 case "+":
                     currentDirection = currentBranchCondition.getDirection();
 
-                    const randomAxis = Utils.getRandomDirection();
-                    const randomAngle =
+                    var randomAxis = Utils.getRandomDirection();
+                    var randomAngle =
                         (RandomNumberGenerator.seedRandom() * 2 - 1) *
                         this.branchMaxAngle;
 
@@ -197,18 +204,45 @@ export default class BranchCoral extends MyObject {
                     currentBranchCondition.setDirection(newDirection);
                     break;
                 case "-":
-                    const lastRotation =
-                        currentBranchCondition.getLastRotation();
-                    if (lastRotation) {
-                        currentDirection =
-                            currentBranchCondition.getDirection();
-                        // Revert the rotation
-                        newDirection = currentDirection.applyAxisAngle(
-                            lastRotation.axis,
-                            -lastRotation.angle
+                    currentDirection = currentBranchCondition.getDirection();
+
+                    var randomAxis = Utils.getRandomDirection();
+                    var randomAngle =
+                        (RandomNumberGenerator.seedRandom() * 2 - 1) *
+                        this.branchMaxAngle *
+                        0.3;
+
+                    newDirection = currentDirection
+                        .applyAxisAngle(randomAxis, randomAngle)
+                        .normalize();
+
+                    if (this.centerOriented) {
+                        const p = this.calProbability(
+                            currentBranchCondition.getLayer()
                         );
-                        currentBranchCondition.setDirection(newDirection);
+                        const randomNumber = RandomNumberGenerator.seedRandom();
+
+                        if (true) {
+                            // Coral branches will tends to grow towards the center
+                            let alpha = Utils.dotProduct(
+                                Utils.getUpVector().normalize(),
+                                newDirection.clone()
+                            );
+                            alpha = Math.max(0, Math.min(1, alpha));
+
+                            const vector1 = Utils.getUpVector()
+                                .clone()
+                                .multiplyScalar(1 - alpha);
+                            const vector2 = newDirection
+                                .clone()
+                                .multiplyScalar(alpha);
+
+                            newDirection = vector1.add(vector2);
+                            newDirection.normalize();
+                        }
                     }
+
+                    currentBranchCondition.setDirection(newDirection);
                     break;
                 case "L":
                     var endPoint = this.createBranch(
@@ -216,7 +250,7 @@ export default class BranchCoral extends MyObject {
                         currentBranchCondition.getDirection(),
                         currentBranchCondition.getThickness(),
                         currentBranchCondition.getThickness(),
-                        currentBranchCondition.getLength() * 0.2
+                        currentBranchCondition.getLength()
                     );
                     currentBranchCondition.setPosition(endPoint);
                     break;
@@ -308,24 +342,27 @@ export default class BranchCoral extends MyObject {
             return this.color;
         }
 
-        setLastRotation(axis, angle) {
-            this.lastRotation = { axis, angle };
-        }
-
-        getLastRotation() {
-            return this.lastRotation;
-        }
-
         clone() {
-            const clone = new this.constructor(
-                this.position.clone(),
-                this.direction.clone(),
-                this.thickness,
-                this.length,
-                this.color,
-                this.layer
-            );
-            clone.lastRotation = this.lastRotation; // Clone the last rotation
+            let clone = null;
+            if (this.position == null) {
+                clone = new this.constructor(
+                    null,
+                    this.direction.clone(),
+                    this.thickness,
+                    this.length,
+                    this.color,
+                    this.layer
+                );
+            } else {
+                clone = new this.constructor(
+                    this.position.clone(),
+                    this.direction.clone(),
+                    this.thickness,
+                    this.length,
+                    this.color,
+                    this.layer
+                );
+            }
             return clone;
         }
     };
