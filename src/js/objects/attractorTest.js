@@ -54,25 +54,29 @@ export default class AttractorTest extends MyObject {
     generate() {
         super.generate();
 
-        for (let i = 0; i < this.numPoints; i++) {
-            const r = RandomNumberGenerator.seedRandom(
-                this.radius / 2,
-                this.radius
-            );
-            // this.radius * Math.cbrt(RandomNumberGenerator.seedRandom());
-            const theta = RandomNumberGenerator.seedRandom(
-                Math.PI / 4,
-                (Math.PI * 3) / 4
-            );
-            // const phi = Math.acos(2 * RandomNumberGenerator.seedRandom() - 1);
-            const phi = RandomNumberGenerator.seedRandom(
-                Math.PI / 4,
-                (Math.PI * 3) / 4
-            );
+        this.radius = 5;
+        let height = 10;
 
-            const x = r * Math.sin(phi) * Math.cos(theta);
-            const y = r * Math.sin(phi) * Math.sin(theta);
-            const z = r * Math.cos(phi);
+        for (let i = 0; i < this.numPoints; i++) {
+            // Random height position (y-coordinate)
+            let y_ = RandomNumberGenerator.seedRandom() * height - height / 2; // Center the cylinder at the origin
+
+            // Random radial distance, sampled proportionally to area
+            const r =
+                Math.sqrt(RandomNumberGenerator.seedRandom()) * this.radius;
+
+            // Random angle around the circular cross-section
+            const theta = RandomNumberGenerator.seedRandom() * 2 * Math.PI;
+
+            // Convert polar coordinates to Cartesian coordinates
+            let x_ = r * Math.cos(theta);
+            let z_ = r * Math.sin(theta);
+
+            let x = x_;
+            let y = z_;
+            let z = y_;
+
+            y += height;
 
             const point = new THREE.Vector3(x, y, z);
 

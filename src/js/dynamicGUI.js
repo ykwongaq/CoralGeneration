@@ -16,6 +16,7 @@ import StaghornCoral2 from "./objects/staghornCoral2";
 import AntlerCoral from "./objects/antlerCoral";
 import ObstacleTest from "./objects/obstacleTest";
 import WhipCoral from "./objects/whipCoral";
+import PreciousCoral from "./objects/preciousCoral";
 
 import { GUI } from "dat.gui";
 
@@ -47,6 +48,7 @@ export default class DynamicGUI {
             StaghornCoral.NAME,
             StaghornCoral2.NAME,
             AntlerCoral.NAME,
+            PreciousCoral.NAME,
         ];
 
         // Debug Mode
@@ -166,6 +168,9 @@ export default class DynamicGUI {
                 break;
             case WhipCoral.NAME:
                 this.generateWhipCoralParameters();
+                break;
+            case PreciousCoral.NAME:
+                this.generatePreciousCoralParameters();
                 break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
@@ -1174,5 +1179,104 @@ export default class DynamicGUI {
             .onChange(() => {
                 this.updateObject();
             });
+    }
+
+    generatePreciousCoralParameters() {
+        const preciousCoralParameters = PreciousCoral.getParams();
+
+        this.folder.add(preciousCoralParameters, "seed").listen();
+        this.folder
+            .add(
+                {
+                    regenerate: () => {
+                        preciousCoralParameters.seed = Math.floor(
+                            RandomNumberGenerator.random() * 1000000
+                        );
+                        this.updateObject();
+                    },
+                },
+                "regenerate"
+            )
+            .name("Regenerate Seed");
+        this.folder
+            .add(
+                {
+                    startRender: async () => {
+                        this.disable();
+                        await this.objectGenerator.startRender();
+                        this.enable();
+                    },
+                },
+                "startRender"
+            )
+            .name("Render");
+        const stemSettings = this.addFolder("Stem Settings");
+        stemSettings
+            .add(preciousCoralParameters, "iterations", 1, 10)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        stemSettings
+            .add(preciousCoralParameters, "stemLength", 1, 30)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        stemSettings
+            .add(preciousCoralParameters, "segmentLength", 0.1, 10)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        stemSettings
+            .add(preciousCoralParameters, "stemThickness", 1, 10)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        stemSettings
+            .add(preciousCoralParameters, "canalizeThickness", 0, 1)
+            .step(0.01)
+            .onChange(() => {
+                this.updateObject();
+            });
+        stemSettings
+            .add(preciousCoralParameters, "maxThickness", 10, 40)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        stemSettings
+            .add(preciousCoralParameters, "branchAngle", 0, Math.PI)
+            .step(0.01)
+            .onChange(() => {
+                this.updateObject();
+            });
+
+        const attractorSettings = this.addFolder("Attractor Settings");
+        attractorSettings
+            .add(preciousCoralParameters, "height", 0, 10)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        attractorSettings
+            .add(preciousCoralParameters, "radius", 0, 50)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        attractorSettings
+            .add(preciousCoralParameters, "numAttractors")
+            .onChange(() => {
+                this.updateObject();
+            });
+        attractorSettings
+            .add(preciousCoralParameters, "influenceDistance", 1, 30)
+            .step(1);
+        attractorSettings
+            .add(preciousCoralParameters, "killDistance", 1, 30)
+            .step(1);
     }
 }

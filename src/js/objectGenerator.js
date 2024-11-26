@@ -14,6 +14,7 @@ import StaghornCoral2 from "./objects/staghornCoral2.js";
 import AntlerCoral from "./objects/antlerCoral.js";
 import ObstacleTest from "./objects/obstacleTest.js";
 import WhipCoral from "./objects/whipCoral.js";
+import PreciousCoral from "./objects/preciousCoral.js";
 
 export default class ObjectGenerator {
     constructor(scene) {
@@ -75,6 +76,9 @@ export default class ObjectGenerator {
                 break;
             case WhipCoral.NAME:
                 this.object = new WhipCoral(this.scene, this.debugMode);
+                break;
+            case PreciousCoral.NAME:
+                this.object = new PreciousCoral(this.scene, this.debugMode);
                 break;
 
             default:

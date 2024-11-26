@@ -103,6 +103,10 @@ export default class Curve extends MyObject {
         );
     }
 
+    getCurve() {
+        return this.curve;
+    }
+
     generate() {
         const totalPoints = 40;
         const curvePoints = this.curve.getPoints(totalPoints);
