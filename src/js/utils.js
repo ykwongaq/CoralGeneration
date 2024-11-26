@@ -54,4 +54,8 @@ export default class Utils {
             Math.abs(v1.z - v2.z) < tolerance
         );
     }
+
+    static sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
 }

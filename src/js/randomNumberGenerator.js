@@ -1,5 +1,6 @@
 export default class RandomNumberGenerator {
-    static seed = 584446;
+    static DEFAULT_SEED = 584446;
+    static seed = RandomNumberGenerator.DEFAULT_SEED;
     static m = 0x80000000;
     static a = 1103515245;
     static c = 12345;
@@ -16,12 +17,15 @@ export default class RandomNumberGenerator {
         return Math.random();
     }
 
-    static seedRandom() {
+    static seedRandom(min = 0, max = 1) {
+        if (max < min) {
+            throw new Error("max must be greater than min");
+        }
         let newSeed =
             (RandomNumberGenerator.a * RandomNumberGenerator.seed +
                 RandomNumberGenerator.c) %
             RandomNumberGenerator.m;
         RandomNumberGenerator.seed = newSeed;
-        return newSeed / RandomNumberGenerator.m;
+        return min + ((max - min) * newSeed) / RandomNumberGenerator.m;
     }
 }

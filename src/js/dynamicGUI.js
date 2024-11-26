@@ -5,10 +5,14 @@ import CollisionTest from "./objects/collisionTest";
 import FlatTree from "./objects/flatTree";
 import LSystemTree from "./objects/lSystemTree";
 import BranchCoral from "./objects/branchCoral";
-import ObjectGenerator from "./objects/objectGenerator";
+import ObjectGenerator from "./objectGenerator";
 import RandomNumberGenerator from "./randomNumberGenerator";
 import Curve from "./objects/curve";
 import BranchCoralCurve from "./objects/branchCoralCurve";
+import AttractorTest from "./objects/attractorTest";
+import SCA_Test from "./objects/SCA_Test";
+import SCACoral from "./objects/SCACoral";
+
 import { GUI } from "dat.gui";
 
 export default class DynamicGUI {
@@ -28,11 +32,14 @@ export default class DynamicGUI {
             Cube.NAME,
             Cylinder.NAME,
             CollisionTest.NAME,
+            Curve.NAME,
+            AttractorTest.NAME,
+            SCA_Test.NAME,
             FlatTree.NAME,
             LSystemTree.NAME,
             BranchCoral.NAME,
-            Curve.NAME,
             BranchCoralCurve.NAME,
+            SCACoral.NAME,
         ];
 
         // Debug Mode
@@ -61,6 +68,16 @@ export default class DynamicGUI {
     updateObject() {
         const objectName = this.params.object;
         this.objectGenerator.generateObject(objectName);
+    }
+
+    disable() {
+        this.gui.domElement.style.pointerEvents = "none";
+        this.gui.domElement.style.opacity = 0.5;
+    }
+
+    enable() {
+        this.gui.domElement.style.pointerEvents = "auto";
+        this.gui.domElement.style.opacity = 1;
     }
 
     createObjectSelector() {
@@ -121,6 +138,15 @@ export default class DynamicGUI {
                 break;
             case BranchCoralCurve.NAME:
                 this.generateBranchCoralCurveParameters();
+                break;
+            case AttractorTest.NAME:
+                this.generateAttractorTestParameters();
+                break;
+            case SCA_Test.NAME:
+                this.generateSCATestParameters();
+                break;
+            case SCACoral.NAME:
+                this.generateSCACoralParameters();
                 break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
@@ -636,5 +662,164 @@ export default class DynamicGUI {
             .onChange(() => {
                 this.updateObject();
             });
+    }
+
+    generateAttractorTestParameters() {
+        const attractorTestParameters = AttractorTest.getParams();
+        this.folder
+            .add(attractorTestParameters, "radius", 5, 30)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(attractorTestParameters, "numPoints", 1, 30)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(attractorTestParameters, "influenceDistance", 1, 30)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(attractorTestParameters, "killDistance", 1, 30)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+    }
+
+    generateSCATestParameters() {
+        const scCoralTestParameters = SCA_Test.getParams();
+        this.folder.add(scCoralTestParameters, "maxIteration", 1, 1000).step(1);
+
+        this.folder
+            .add(
+                {
+                    startRender: async () => {
+                        this.disable();
+                        this.updateObject();
+                        await this.objectGenerator.startRender();
+                        this.enable();
+                    },
+                },
+                "startRender"
+            )
+            .name("Render");
+
+        const attractorSetting = this.addFolder("Attractor Setting");
+        // attractorSetting
+        //     .add(scCoralTestParameters, "numAttractors")
+        //     .onChange(() => {
+        //         this.updateObject();
+        //     });
+        attractorSetting
+            .add(scCoralTestParameters, "influenceDistance", 1, 30)
+            .step(1);
+
+        attractorSetting
+            .add(scCoralTestParameters, "killDistance", 1, 30)
+            .step(1);
+
+        attractorSetting
+            .add(scCoralTestParameters, "positionX", -30, 30)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        attractorSetting
+            .add(scCoralTestParameters, "positionY", -30, 30)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        attractorSetting
+            .add(scCoralTestParameters, "positionZ", -30, 30)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+
+        const nodeSetting = this.addFolder("Node Setting");
+        nodeSetting.add(scCoralTestParameters, "segmentLength", 1, 30).step(1);
+        nodeSetting
+            .add(scCoralTestParameters, "basicThickness", 0.1, 30)
+            .step(0.1);
+        nodeSetting
+            .add(scCoralTestParameters, "canalizeThickness", 0.1, 30)
+            .step(0.1);
+        nodeSetting
+            .add(scCoralTestParameters, "maxThickness", 0.1, 30)
+            .step(0.1);
+
+        nodeSetting.addColor(scCoralTestParameters, "color");
+    }
+
+    generateSCACoralParameters() {
+        const SCACoralParameters = SCACoral.getParams();
+        this.folder
+            .add(SCACoralParameters, "radius", 10, 50)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(SCACoralParameters, "numAttractors", 1, 5000)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(SCACoralParameters, "seed")
+            .name("Random Seed")
+            .listen();
+        this.folder
+            .add(
+                {
+                    regenerate: () => {
+                        SCACoralParameters.seed = Math.floor(
+                            RandomNumberGenerator.random() * 1000000
+                        );
+                        this.updateObject();
+                    },
+                },
+                "regenerate"
+            )
+            .name("Regenerate Seed");
+        this.folder.add(SCACoralParameters, "maxIteration");
+        this.folder
+            .add(
+                {
+                    startRender: async () => {
+                        this.disable();
+                        this.updateObject();
+                        await this.objectGenerator.startRender();
+                        this.enable();
+                    },
+                },
+                "startRender"
+            )
+            .name("Render");
+
+        const attractorSetting = this.addFolder("Attractor Setting");
+        attractorSetting
+            .add(SCACoralParameters, "influenceDistance", 1, 30)
+            .step(1);
+        attractorSetting.add(SCACoralParameters, "killDistance", 1, 30).step(1);
+
+        const nodeSetting = this.addFolder("Node Setting");
+        nodeSetting.add(SCACoralParameters, "segmentLength", 1, 30).step(1);
+        nodeSetting
+            .add(SCACoralParameters, "basicThickness", 0.1, 30)
+            .step(0.1);
+        nodeSetting
+            .add(SCACoralParameters, "canalizeThickness", 0, 2)
+            .step(0.01);
+        nodeSetting.add(SCACoralParameters, "maxThickness", 0.1, 30).step(0.1);
+
+        nodeSetting.addColor(SCACoralParameters, "color");
     }
 }
