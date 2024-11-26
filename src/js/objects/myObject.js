@@ -6,8 +6,8 @@ export default class MyObject {
         this.scene = scene;
         this.debugMode = debugMode;
 
-        this.centerSphere = this.genCenterSphere();
-        this.arrowHelper = this.genMeshDirectionArrow();
+        // this.centerSphere = this.genCenterSphere();
+        // this.arrowHelper = this.genMeshDirectionArrow();
     }
 
     generate() {
@@ -17,11 +17,11 @@ export default class MyObject {
 
         this.mesh.isMyObject = true;
         this.scene.add(this.mesh);
-        if (this.debugMode) {
-            this.centerSphere.position.copy(this.mesh.position);
-            this.scene.add(this.centerSphere);
-            this.mesh.add(this.arrowHelper);
-        }
+        // if (this.debugMode) {
+        //     this.centerSphere.position.copy(this.mesh.position);
+        //     this.scene.add(this.centerSphere);
+        //     this.mesh.add(this.arrowHelper);
+        // }
     }
 
     clear() {

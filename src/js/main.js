@@ -9,8 +9,8 @@ function main() {
     // Create a scene
     const scene = new THREE.Scene();
 
-    scene.background = new THREE.Color( 0x87adc4);
-    scene.fog = new THREE.Fog( 0x87adc4, 20, 50 );
+    scene.background = new THREE.Color(0x87adc4);
+    scene.fog = new THREE.Fog(0x87adc4, 20, 50);
 
     // Setup a camera
     const camera = new THREE.PerspectiveCamera(
@@ -43,8 +43,9 @@ function main() {
         RIGHT: THREE.MOUSE.PAN,
     };
     controls.maxPolarAngle = Math.PI * 0.5;
-    controls.maxDistance = camera.far/1.9;
-    controls.minDistance = camera.near;
+    // controls.maxDistance = camera.far / 1.9;
+    controls.maxDistance = camera.far * 2;
+    controls.minDistance = camera.near * 2;
 
     // // Ambient Light
     // const Ambient = new THREE.AmbientLight(0xffffff, 0.5);
@@ -55,19 +56,19 @@ function main() {
     // directionalLight.position.set(10, 10, 10);
     // scene.add(directionalLight);
 
-    let pointLight = new THREE.PointLight(0xFFFFFF, 150);
+    let pointLight = new THREE.PointLight(0xffffff, 150);
     let hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 2);
-    pointLight.position.set(20,50,20);
+    pointLight.position.set(20, 50, 20);
     pointLight.castShadow = true;
     scene.add(pointLight, hemisphereLight);
-    let seabedTexture = new THREE.TextureLoader().load('./static/seabed.jpg');
+    let seabedTexture = new THREE.TextureLoader().load("./static/seabed.jpg");
     seabedTexture.wrapS = seabedTexture.wrapT = THREE.RepeatWrapping;
-    seabedTexture.repeat.set(50,50);
-    let seabedGeometry = new THREE.PlaneGeometry( 1000, 1000 );
-    let seabedMaterial = new THREE.MeshPhongMaterial({map:seabedTexture});
+    seabedTexture.repeat.set(50, 50);
+    let seabedGeometry = new THREE.PlaneGeometry(1000, 1000);
+    let seabedMaterial = new THREE.MeshPhongMaterial({ map: seabedTexture });
     let seabed = new THREE.Mesh(seabedGeometry, seabedMaterial);
     seabed.position.y = 0;
-    seabed.rotation.x = - Math.PI / 2;
+    seabed.rotation.x = -Math.PI / 2;
     seabed.receiveShadow = true;
     scene.add(seabed);
 

@@ -12,7 +12,7 @@ import BranchCoralCurve from "./objects/branchCoralCurve";
 import AttractorTest from "./objects/attractorTest";
 import SCA_Test from "./objects/SCA_Test";
 import SCACoral from "./objects/SCACoral";
-
+import AntlerCoral from "./objects/antlerCoral";
 import { GUI } from "dat.gui";
 
 export default class DynamicGUI {
@@ -40,6 +40,7 @@ export default class DynamicGUI {
             BranchCoral.NAME,
             BranchCoralCurve.NAME,
             SCACoral.NAME,
+            AntlerCoral.NAME,
         ];
 
         // Debug Mode
@@ -147,6 +148,9 @@ export default class DynamicGUI {
                 break;
             case SCACoral.NAME:
                 this.generateSCACoralParameters();
+                break;
+            case AntlerCoral.NAME:
+                this.generateAntlerCoralParameters();
                 break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
@@ -673,8 +677,8 @@ export default class DynamicGUI {
                 this.updateObject();
             });
         this.folder
-            .add(attractorTestParameters, "numPoints", 1, 30)
-            .step(1)
+            .add(attractorTestParameters, "numPoints", 500, 5000)
+            .step(100)
             .onChange(() => {
                 this.updateObject();
             });
@@ -821,5 +825,74 @@ export default class DynamicGUI {
         nodeSetting.add(SCACoralParameters, "maxThickness", 0.1, 30).step(0.1);
 
         nodeSetting.addColor(SCACoralParameters, "color");
+    }
+
+    generateAntlerCoralParameters() {
+        const antlerCoarlParameters = AntlerCoral.getParams();
+        this.folder
+            .add(antlerCoarlParameters, "radius", 10, 50)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(antlerCoarlParameters, "numAttractors", 1, 5000)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(antlerCoarlParameters, "seed")
+            .name("Random Seed")
+            .listen();
+        this.folder
+            .add(
+                {
+                    regenerate: () => {
+                        antlerCoarlParameters.seed = Math.floor(
+                            RandomNumberGenerator.random() * 1000000
+                        );
+                        this.updateObject();
+                    },
+                },
+                "regenerate"
+            )
+            .name("Regenerate Seed");
+        this.folder.add(antlerCoarlParameters, "maxIteration");
+        this.folder
+            .add(
+                {
+                    startRender: async () => {
+                        this.disable();
+                        this.updateObject();
+                        await this.objectGenerator.startRender();
+                        this.enable();
+                    },
+                },
+                "startRender"
+            )
+            .name("Render");
+
+        const attractorSetting = this.addFolder("Attractor Setting");
+        attractorSetting
+            .add(antlerCoarlParameters, "influenceDistance", 1, 30)
+            .step(1);
+        attractorSetting
+            .add(antlerCoarlParameters, "killDistance", 1, 30)
+            .step(1);
+
+        const nodeSetting = this.addFolder("Node Setting");
+        nodeSetting.add(antlerCoarlParameters, "segmentLength", 1, 30).step(1);
+        nodeSetting
+            .add(antlerCoarlParameters, "basicThickness", 0.1, 30)
+            .step(0.1);
+        nodeSetting
+            .add(antlerCoarlParameters, "canalizeThickness", 0, 2)
+            .step(0.01);
+        nodeSetting
+            .add(antlerCoarlParameters, "maxThickness", 0.1, 30)
+            .step(0.1);
+
+        nodeSetting.addColor(antlerCoarlParameters, "color");
     }
 }

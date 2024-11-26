@@ -10,6 +10,7 @@ import AttractorTest from "./objects/attractorTest.js";
 import SCA_Test from "./objects/SCA_Test.js";
 import MyAnimateObject from "./objects/myAnimateObject.js";
 import SCACoral from "./objects/SCACoral.js";
+import AntlerCoral from "./objects/antlerCoral.js";
 
 export default class ObjectGenerator {
     constructor(scene) {
@@ -59,6 +60,9 @@ export default class ObjectGenerator {
                 break;
             case SCACoral.NAME:
                 this.object = new SCACoral(this.scene, this.debugMode);
+                break;
+            case AntlerCoral.NAME:
+                this.object = new AntlerCoral(this.scene, this.debugMode);
                 break;
 
             default:

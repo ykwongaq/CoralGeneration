@@ -6,7 +6,7 @@ import Attractor from "../SCA/attractor";
 export default class AttractorTest extends MyObject {
     static PARAMS = {
         radius: 10,
-        numPoints: 10,
+        numPoints: 1000,
 
         influenceDistance: 5,
         killDistance: 1,
@@ -48,17 +48,27 @@ export default class AttractorTest extends MyObject {
             opacity: 0.5,
         });
 
-        this.mesh = new THREE.Mesh(geometry, material);
+        // this.mesh = new THREE.Mesh(geometry, material);
     }
 
     generate() {
         super.generate();
 
         for (let i = 0; i < this.numPoints; i++) {
-            const r =
-                this.radius * Math.cbrt(RandomNumberGenerator.seedRandom());
-            const theta = RandomNumberGenerator.seedRandom() * Math.PI;
-            const phi = Math.acos(2 * RandomNumberGenerator.seedRandom() - 1);
+            const r = RandomNumberGenerator.seedRandom(
+                this.radius / 2,
+                this.radius
+            );
+            // this.radius * Math.cbrt(RandomNumberGenerator.seedRandom());
+            const theta = RandomNumberGenerator.seedRandom(
+                Math.PI / 4,
+                (Math.PI * 3) / 4
+            );
+            // const phi = Math.acos(2 * RandomNumberGenerator.seedRandom() - 1);
+            const phi = RandomNumberGenerator.seedRandom(
+                Math.PI / 4,
+                (Math.PI * 3) / 4
+            );
 
             const x = r * Math.sin(phi) * Math.cos(theta);
             const y = r * Math.sin(phi) * Math.sin(theta);
@@ -75,10 +85,10 @@ export default class AttractorTest extends MyObject {
             );
             attractor.generate();
 
-            if (this.debugMode) {
-                attractor.showInference();
-                attractor.showKill();
-            }
+            // if (this.debugMode) {
+            //     attractor.showInference();
+            //     attractor.showKill();
+            // }
         }
     }
 }
