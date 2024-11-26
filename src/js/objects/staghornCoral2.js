@@ -8,22 +8,22 @@ import Utils from "../utils";
 
 import * as THREE from "three";
 
-export default class SCACoral extends MyAnimateObject {
+export default class StaghornCoral2 extends MyAnimateObject {
     static PARAMS = {
         radius: 30,
-        numAttractors: 1000,
+        numAttractors: 2000,
         seed: RandomNumberGenerator.DEFAULT_SEED,
         maxIteration: 1000,
 
         // Attractors
-        influenceDistance: 10,
+        influenceDistance: 30,
         killDistance: 2,
 
         // Node
         segmentLength: 1,
-        basicThickness: 5,
+        basicThickness: 3,
         canalizeThickness: 0.01,
-        maxThickness: 20,
+        maxThickness: 15,
         color: {
             r: 139,
             g: 69,
@@ -31,26 +31,26 @@ export default class SCACoral extends MyAnimateObject {
         },
     };
 
-    static NAME = "SCA-Coral";
+    static NAME = "StaghornCoral2";
 
     static getParams() {
-        return SCACoral.PARAMS;
+        return StaghornCoral2.PARAMS;
     }
 
     constructor(
         scene,
         debugMode = false,
-        radius = SCACoral.PARAMS.radius,
-        numAttractors = SCACoral.PARAMS.numAttractors,
-        seed = SCACoral.PARAMS.seed,
-        maxIteration = SCACoral.PARAMS.maxIteration,
-        influenceDistance = SCACoral.PARAMS.influenceDistance,
-        killDistance = SCACoral.PARAMS.killDistance,
-        segmentLength = SCACoral.PARAMS.segmentLength,
-        basicThickness = SCACoral.PARAMS.basicThickness,
-        canalizeThickness = SCACoral.PARAMS.canalizeThickness,
-        maxThickness = SCACoral.PARAMS.maxThickness,
-        colorRGB = SCACoral.PARAMS.color
+        radius = StaghornCoral2.PARAMS.radius,
+        numAttractors = StaghornCoral2.PARAMS.numAttractors,
+        seed = StaghornCoral2.PARAMS.seed,
+        maxIteration = StaghornCoral2.PARAMS.maxIteration,
+        influenceDistance = StaghornCoral2.PARAMS.influenceDistance,
+        killDistance = StaghornCoral2.PARAMS.killDistance,
+        segmentLength = StaghornCoral2.PARAMS.segmentLength,
+        basicThickness = StaghornCoral2.PARAMS.basicThickness,
+        canalizeThickness = StaghornCoral2.PARAMS.canalizeThickness,
+        maxThickness = StaghornCoral2.PARAMS.maxThickness,
+        colorRGB = StaghornCoral2.PARAMS.color
     ) {
         super(scene, debugMode);
         RandomNumberGenerator.setSeed(seed);
@@ -100,14 +100,20 @@ export default class SCACoral extends MyAnimateObject {
     generateAttractors() {
         const attractors = [];
         for (let i = 0; i < this.numAttractors; i++) {
-            const r =
-                this.radius * Math.cbrt(RandomNumberGenerator.seedRandom());
+            const r = RandomNumberGenerator.seedRandom(
+                this.radius * 0.05,
+                this.radius
+            );
             const theta = RandomNumberGenerator.seedRandom() * Math.PI;
             const phi = Math.acos(2 * RandomNumberGenerator.seedRandom() - 1);
 
-            const x = r * Math.sin(phi) * Math.cos(theta);
-            const y = r * Math.sin(phi) * Math.sin(theta);
-            const z = r * Math.cos(phi);
+            let x = r * Math.sin(phi) * Math.cos(theta);
+            let y = r * Math.sin(phi) * Math.sin(theta);
+            let z = r * Math.cos(phi);
+
+            // Flip the sphere
+            y = this.radius - y;
+            y = y + 3;
 
             const point = new THREE.Vector3(x, y, z);
 

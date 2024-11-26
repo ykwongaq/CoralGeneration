@@ -11,7 +11,8 @@ import Curve from "./objects/curve";
 import BranchCoralCurve from "./objects/branchCoralCurve";
 import AttractorTest from "./objects/attractorTest";
 import SCA_Test from "./objects/SCA_Test";
-import SCACoral from "./objects/SCACoral";
+import StaghornCoral from "./objects/staghornCoral";
+import StaghornCoral2 from "./objects/staghornCoral2";
 import AntlerCoral from "./objects/antlerCoral";
 import ObstacleTest from "./objects/obstacleTest";
 import WhipCoral from "./objects/whipCoral";
@@ -43,7 +44,8 @@ export default class DynamicGUI {
             LSystemTree.NAME,
             BranchCoral.NAME,
             WhipCoral.NAME,
-            SCACoral.NAME,
+            StaghornCoral.NAME,
+            StaghornCoral2.NAME,
             AntlerCoral.NAME,
         ];
 
@@ -150,8 +152,11 @@ export default class DynamicGUI {
             case SCA_Test.NAME:
                 this.generateSCATestParameters();
                 break;
-            case SCACoral.NAME:
-                this.generateSCACoralParameters();
+            case StaghornCoral.NAME:
+                this.generateStaghornCoralParameters();
+                break;
+            case StaghornCoral2.NAME:
+                this.generateStaghornCoral2Parameters();
                 break;
             case AntlerCoral.NAME:
                 this.generateAntlerCoralParameters();
@@ -850,8 +855,8 @@ export default class DynamicGUI {
         nodeSetting.addColor(scCoralTestParameters, "color");
     }
 
-    generateSCACoralParameters() {
-        const SCACoralParameters = SCACoral.getParams();
+    generateStaghornCoralParameters() {
+        const SCACoralParameters = StaghornCoral.getParams();
         this.folder
             .add(SCACoralParameters, "radius", 10, 50)
             .step(1)
@@ -913,6 +918,77 @@ export default class DynamicGUI {
         nodeSetting.add(SCACoralParameters, "maxThickness", 0.1, 30).step(0.1);
 
         nodeSetting.addColor(SCACoralParameters, "color");
+    }
+
+    generateStaghornCoral2Parameters() {
+        const StaghornCoral2Parameters = StaghornCoral2.getParams();
+        this.folder
+            .add(StaghornCoral2Parameters, "radius", 10, 50)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(StaghornCoral2Parameters, "numAttractors", 1, 5000)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(StaghornCoral2Parameters, "seed")
+            .name("Random Seed")
+            .listen();
+        this.folder
+            .add(
+                {
+                    regenerate: () => {
+                        StaghornCoral2Parameters.seed = Math.floor(
+                            RandomNumberGenerator.random() * 1000000
+                        );
+                        this.updateObject();
+                    },
+                },
+                "regenerate"
+            )
+            .name("Regenerate Seed");
+        this.folder.add(StaghornCoral2Parameters, "maxIteration");
+        this.folder
+            .add(
+                {
+                    startRender: async () => {
+                        this.disable();
+                        this.updateObject();
+                        await this.objectGenerator.startRender();
+                        this.enable();
+                    },
+                },
+                "startRender"
+            )
+            .name("Render");
+
+        const attractorSetting = this.addFolder("Attractor Setting");
+        attractorSetting
+            .add(StaghornCoral2Parameters, "influenceDistance", 1, 30)
+            .step(1);
+        attractorSetting
+            .add(StaghornCoral2Parameters, "killDistance", 1, 30)
+            .step(1);
+
+        const nodeSetting = this.addFolder("Node Setting");
+        nodeSetting
+            .add(StaghornCoral2Parameters, "segmentLength", 1, 30)
+            .step(0.1);
+        nodeSetting
+            .add(StaghornCoral2Parameters, "basicThickness", 0.1, 30)
+            .step(0.1);
+        nodeSetting
+            .add(StaghornCoral2Parameters, "canalizeThickness", 0, 2)
+            .step(0.01);
+        nodeSetting
+            .add(StaghornCoral2Parameters, "maxThickness", 0.1, 30)
+            .step(0.1);
+
+        nodeSetting.addColor(StaghornCoral2Parameters, "color");
     }
 
     generateAntlerCoralParameters() {
