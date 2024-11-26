@@ -14,6 +14,8 @@ import SCA_Test from "./objects/SCA_Test";
 import SCACoral from "./objects/SCACoral";
 import AntlerCoral from "./objects/antlerCoral";
 import ObstacleTest from "./objects/obstacleTest";
+import WhipCoral from "./objects/whipCoral";
+
 import { GUI } from "dat.gui";
 
 export default class DynamicGUI {
@@ -40,7 +42,7 @@ export default class DynamicGUI {
             FlatTree.NAME,
             LSystemTree.NAME,
             BranchCoral.NAME,
-            BranchCoralCurve.NAME,
+            WhipCoral.NAME,
             SCACoral.NAME,
             AntlerCoral.NAME,
         ];
@@ -156,6 +158,9 @@ export default class DynamicGUI {
                 break;
             case ObstacleTest.NAME:
                 this.generateObstacleTestParameters();
+                break;
+            case WhipCoral.NAME:
+                this.generateWhipCoralParameters();
                 break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
@@ -536,7 +541,10 @@ export default class DynamicGUI {
             .onChange(() => {
                 this.updateObject();
             });
-        this.folder.addColor(curveParameters, "color").onChange(() => {
+        this.folder.addColor(curveParameters, "startColor").onChange(() => {
+            this.updateObject();
+        });
+        this.folder.addColor(curveParameters, "endColor").onChange(() => {
             this.updateObject();
         });
 
@@ -590,6 +598,79 @@ export default class DynamicGUI {
         widthFolder
             .add(curveParameters, "endWidth", 1, 30)
             .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+    }
+
+    generateWhipCoralParameters() {
+        const whipCoralParameters = WhipCoral.getParams();
+        this.folder
+            .add(whipCoralParameters, "iteration", 0, 8)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(whipCoralParameters, "seed")
+            .name("Random Seed")
+            .listen();
+        this.folder
+            .add(
+                {
+                    regenerate: () => {
+                        whipCoralParameters.seed = Math.floor(
+                            RandomNumberGenerator.random() * 1000000
+                        );
+                        this.updateObject();
+                    },
+                },
+                "regenerate"
+            )
+            .name("Regenerate Seed");
+
+        const centerSetting = this.addFolder("Center Orientation");
+        centerSetting
+            .add(whipCoralParameters, "centerOriented")
+            .name("Center Oriented")
+            .onChange(() => {
+                this.updateObject();
+            });
+        centerSetting
+            .add(whipCoralParameters, "centerDegree", 0, 1)
+            .step(0.01)
+            .name("Center Degree")
+            .onChange(() => {
+                this.updateObject();
+            });
+
+        const branchSetting = this.addFolder("Branch Setting");
+        branchSetting
+            .add(whipCoralParameters, "rootThickness", 4, 30)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(whipCoralParameters, "rootLength", 1, 10)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(whipCoralParameters, "branchThicknessScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(whipCoralParameters, "branchLengthScaler", 0, 1)
+            .step(0.1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        branchSetting
+            .add(whipCoralParameters, "branchMaxAngle", 0, Math.PI)
             .onChange(() => {
                 this.updateObject();
             });

@@ -14,12 +14,12 @@ export default class Curve extends MyObject {
     static PARAMS = {
         // Control Point 1
         controlPoint1X: -2,
-        controlPoint1Y: -2,
+        controlPoint1Y: -2 + 5,
         controlPoint1Z: 2,
 
         // Control Point 2
         controlPoint2X: 2,
-        controlPoint2Y: 2,
+        controlPoint2Y: 2 + 5,
         controlPoint2Z: -2,
 
         // Curve Type
@@ -30,17 +30,23 @@ export default class Curve extends MyObject {
         endWidth: 1,
 
         // Color
-        color: {
-            r: 52,
-            g: 141,
-            b: 182,
+        startColor: {
+            r: 255,
+            g: 0,
+            b: 0,
+        },
+
+        endColor: {
+            r: 0,
+            g: 0,
+            b: 255,
         },
     };
 
     static NAME = "Curve";
 
-    static DEFAULT_STARTING_POINT = new THREE.Vector3(-5, 0, 0);
-    static DEFAULT_ENDING_POINT = new THREE.Vector3(5, 0, 0);
+    static DEFAULT_STARTING_POINT = new THREE.Vector3(-5, 5, 0);
+    static DEFAULT_ENDING_POINT = new THREE.Vector3(5, 5, 0);
 
     constructor(
         scene,
@@ -48,7 +54,8 @@ export default class Curve extends MyObject {
         controlPoints = null,
         startWidth = Curve.PARAMS.startWidth,
         endWidth = Curve.PARAMS.endWidth,
-        colorRGB = Curve.PARAMS.color,
+        startColorRGB = Curve.PARAMS.startColor,
+        endColorRGB = Curve.PARAMS.endColor,
         curveType = Curve.PARAMS.curveType
     ) {
         super(scene, debugMode);
@@ -84,14 +91,23 @@ export default class Curve extends MyObject {
 
         this.startWidth = startWidth;
         this.endWidth = endWidth;
-        this.color = Utils.RGB2Color(colorRGB.r, colorRGB.g, colorRGB.b);
+        this.startColor = new THREE.Color(
+            startColorRGB.r / 255,
+            startColorRGB.g / 255,
+            startColorRGB.b / 255
+        );
+        this.endColor = new THREE.Color(
+            endColorRGB.r / 255,
+            endColorRGB.g / 255,
+            endColorRGB.b / 255
+        );
     }
 
     generate() {
-        const totalPoints = 30;
+        const totalPoints = 40;
         const curvePoints = this.curve.getPoints(totalPoints);
 
-        const segmentCount = 15;
+        const segmentCount = 20;
         const pointsPerSegment = totalPoints / segmentCount;
 
         for (let segmentIdx = 0; segmentIdx < segmentCount; segmentIdx++) {
@@ -126,11 +142,17 @@ export default class Curve extends MyObject {
             );
             const averageWidth = (widthStart + widthEnd) / 2;
 
+            // Interpolate color for this segment
+            const tMid = (tStart + tEnd) / 2;
+            const interpolatedColor = this.startColor
+                .clone()
+                .lerp(this.endColor, tMid);
+
             const lineGeometry = new LineGeometry();
             lineGeometry.setPositions(positions);
 
             const lineMaterial = new LineMaterial({
-                color: this.color,
+                color: interpolatedColor,
                 linewidth: averageWidth,
                 dashed: false,
             });
