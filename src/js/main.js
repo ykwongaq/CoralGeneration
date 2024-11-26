@@ -10,7 +10,7 @@ function main() {
     const scene = new THREE.Scene();
 
     scene.background = new THREE.Color(0x87adc4);
-    scene.fog = new THREE.Fog(0x87adc4, 20, 50);
+    scene.fog = new THREE.Fog(0x87adc4, 30, 400);
 
     // Setup a camera
     const camera = new THREE.PerspectiveCamera(
@@ -43,9 +43,8 @@ function main() {
         RIGHT: THREE.MOUSE.PAN,
     };
     controls.maxPolarAngle = Math.PI * 0.5;
-    // controls.maxDistance = camera.far / 1.9;
-    controls.maxDistance = camera.far * 2;
-    controls.minDistance = camera.near * 2;
+    controls.maxDistance = camera.far;
+    controls.minDistance = camera.near;
 
     // // Ambient Light
     // const Ambient = new THREE.AmbientLight(0xffffff, 0.5);
