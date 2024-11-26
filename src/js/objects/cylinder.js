@@ -45,12 +45,24 @@ export default class Cylinder extends MyObject {
             thetaStart,
             thetaLength
         );
-        const color = Utils.RGB2Color(colorRGB.r, colorRGB.g, colorRGB.b);
-        this.material = new THREE.MeshBasicMaterial({
-            color: color,
-            wireframe: debugMode,
-        });
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+
+        var textureLoader = new THREE.TextureLoader();
+        var materials = new THREE.MeshBasicMaterial({map: textureLoader.load("./static/coral4.jpg")});
+        
+        // const bumpMapMaterial = new THREE.MeshPhongMaterial()
+        // const texture = new THREE.TextureLoader().load('./static/11299-bump.jpg')
+        // material.map = texture
+        // const bumpTexture = new THREE.TextureLoader().load('./static/coral4.jpg')
+        // material.bumpMap = bumpTexture
+        // material.bumpScale = 0.025
+
+        // const color = Utils.RGB2Color(colorRGB.r, colorRGB.g, colorRGB.b);
+        // this.material = new THREE.MeshBasicMaterial({
+        //     color: color,
+        //     wireframe: debugMode,
+        // });
+        this.mesh = new THREE.Mesh(this.geometry, materials);
     }
 
     static getParams() {

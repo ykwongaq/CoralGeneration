@@ -9,12 +9,15 @@ function main() {
     // Create a scene
     const scene = new THREE.Scene();
 
+    scene.background = new THREE.Color( 0x87adc4);
+    scene.fog = new THREE.Fog( 0x87adc4, 20, 50 );
+
     // Setup a camera
     const camera = new THREE.PerspectiveCamera(
-        75,
+        40,
         window.innerWidth / window.innerHeight,
-        0.1,
-        1000
+        1,
+        200
     );
     camera.position.set(
         INIT_CAMERA_POSITION.x,
@@ -28,7 +31,7 @@ function main() {
     );
 
     // Setup renderer
-    const renderer = new THREE.WebGLRenderer();
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
@@ -39,15 +42,39 @@ function main() {
         MIDDLE: THREE.MOUSE.DOLLY,
         RIGHT: THREE.MOUSE.PAN,
     };
+    controls.maxPolarAngle = Math.PI * 0.5;
+    controls.maxDistance = camera.far/1.9;
+    controls.minDistance = camera.near;
 
-    // Ambient Light
-    const Ambient = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(Ambient);
+    // // Ambient Light
+    // const Ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    // scene.add(Ambient);
 
-    // Directional Light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(10, 10, 10);
-    scene.add(directionalLight);
+    // // Directional Light
+    // const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    // directionalLight.position.set(10, 10, 10);
+    // scene.add(directionalLight);
+
+    let pointLight = new THREE.PointLight(0xFFFFFF, 150);
+    let hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 2);
+    pointLight.position.set(20,50,20);
+    pointLight.castShadow = true;
+    scene.add(pointLight, hemisphereLight);
+    let seabedTexture = new THREE.TextureLoader().load('./static/seabed.jpg');
+    seabedTexture.wrapS = seabedTexture.wrapT = THREE.RepeatWrapping;
+    seabedTexture.repeat.set(50,50);
+    let seabedGeometry = new THREE.PlaneGeometry( 1000, 1000 );
+    let seabedMaterial = new THREE.MeshPhongMaterial({map:seabedTexture});
+    let seabed = new THREE.Mesh(seabedGeometry, seabedMaterial);
+    seabed.position.y = 0;
+    seabed.rotation.x = - Math.PI / 2;
+    seabed.receiveShadow = true;
+    scene.add(seabed);
+
+    renderer.gammaOutput = true;
+    renderer.physicallyCorrectLights = true;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMapSoft = true;
 
     // User control GUI
     const gui = new DynamicGUI(scene);
