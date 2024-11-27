@@ -8,49 +8,49 @@ import Utils from "../utils";
 
 import * as THREE from "three";
 
-export default class StaghornCoral2 extends MyAnimateObject {
+export default class EnchinogorgiaCoral extends MyAnimateObject {
     static PARAMS = {
         radius: 30,
-        numAttractors: 2000,
+        numAttractors: 3000,
         seed: RandomNumberGenerator.DEFAULT_SEED,
         maxIteration: 1000,
 
         // Attractors
         influenceDistance: 30,
-        killDistance: 2,
+        killDistance: 1,
 
         // Node
         segmentLength: 1,
-        basicThickness: 3,
-        canalizeThickness: 0.01,
-        maxThickness: 15,
+        basicThickness: 5,
+        canalizeThickness: 0,
+        maxThickness: 20,
         color: {
-            r: 139,
-            g: 69,
-            b: 19,
+            r: 128,
+            g: 0,
+            b: 128,
         },
     };
 
-    static NAME = "StaghornCoral";
+    static NAME = "EnchinogorgiaCoral";
 
     static getParams() {
-        return StaghornCoral2.PARAMS;
+        return EnchinogorgiaCoral.PARAMS;
     }
 
     constructor(
         scene,
         debugMode = false,
-        radius = StaghornCoral2.PARAMS.radius,
-        numAttractors = StaghornCoral2.PARAMS.numAttractors,
-        seed = StaghornCoral2.PARAMS.seed,
-        maxIteration = StaghornCoral2.PARAMS.maxIteration,
-        influenceDistance = StaghornCoral2.PARAMS.influenceDistance,
-        killDistance = StaghornCoral2.PARAMS.killDistance,
-        segmentLength = StaghornCoral2.PARAMS.segmentLength,
-        basicThickness = StaghornCoral2.PARAMS.basicThickness,
-        canalizeThickness = StaghornCoral2.PARAMS.canalizeThickness,
-        maxThickness = StaghornCoral2.PARAMS.maxThickness,
-        colorRGB = StaghornCoral2.PARAMS.color
+        radius = EnchinogorgiaCoral.PARAMS.radius,
+        numAttractors = EnchinogorgiaCoral.PARAMS.numAttractors,
+        seed = EnchinogorgiaCoral.PARAMS.seed,
+        maxIteration = EnchinogorgiaCoral.PARAMS.maxIteration,
+        influenceDistance = EnchinogorgiaCoral.PARAMS.influenceDistance,
+        killDistance = EnchinogorgiaCoral.PARAMS.killDistance,
+        segmentLength = EnchinogorgiaCoral.PARAMS.segmentLength,
+        basicThickness = EnchinogorgiaCoral.PARAMS.basicThickness,
+        canalizeThickness = EnchinogorgiaCoral.PARAMS.canalizeThickness,
+        maxThickness = EnchinogorgiaCoral.PARAMS.maxThickness,
+        colorRGB = EnchinogorgiaCoral.PARAMS.color
     ) {
         super(scene, debugMode);
         RandomNumberGenerator.setSeed(seed);
@@ -99,21 +99,31 @@ export default class StaghornCoral2 extends MyAnimateObject {
 
     generateAttractors() {
         const attractors = [];
+
+        this.height = 1;
+        this.radius = 20;
+
         for (let i = 0; i < this.numAttractors; i++) {
-            const r = RandomNumberGenerator.seedRandom(
-                this.radius * 0.05,
-                this.radius
-            );
-            const theta = RandomNumberGenerator.seedRandom() * Math.PI;
-            const phi = Math.acos(2 * RandomNumberGenerator.seedRandom() - 1);
+            const y_ =
+                RandomNumberGenerator.seedRandom() * this.height -
+                this.height / 2;
 
-            let x = r * Math.sin(phi) * Math.cos(theta);
-            let y = r * Math.sin(phi) * Math.sin(theta);
-            let z = r * Math.cos(phi);
+            // Random radial distance, sampled proportionally to area
+            const r =
+                Math.sqrt(RandomNumberGenerator.seedRandom()) * this.radius;
 
-            // Flip the sphere
-            y = this.radius - y;
-            y = y + 3;
+            // Random angle around the circular cross-section
+            const theta = RandomNumberGenerator.seedRandom() * 2 * Math.PI;
+
+            // Convert polar coordinates to Cartesian coordinates
+            let x_ = r * Math.cos(theta);
+            let z_ = r * Math.sin(theta);
+
+            let x = x_;
+            let y = z_;
+            let z = y_;
+
+            y += this.radius;
 
             const point = new THREE.Vector3(x, y, z);
 

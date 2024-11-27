@@ -17,6 +17,7 @@ import AntlerCoral from "./objects/antlerCoral";
 import ObstacleTest from "./objects/obstacleTest";
 import WhipCoral from "./objects/whipCoral";
 import PreciousCoral from "./objects/preciousCoral";
+import EnchinogorgiaCoral from "./objects/enchinogorgiaCoral";
 
 import { GUI } from "dat.gui";
 
@@ -47,6 +48,7 @@ export default class DynamicGUI {
             WhipCoral.NAME,
             StaghornCoral.NAME,
             StaghornCoral2.NAME,
+            EnchinogorgiaCoral.NAME,
             AntlerCoral.NAME,
             PreciousCoral.NAME,
         ];
@@ -171,6 +173,9 @@ export default class DynamicGUI {
                 break;
             case PreciousCoral.NAME:
                 this.generatePreciousCoralParameters();
+                break;
+            case EnchinogorgiaCoral.NAME:
+                this.generateEchninogorgiaCoralParameters();
                 break;
             default:
                 throw new Error("Unhandled obejct: " + this.params.object);
@@ -923,6 +928,77 @@ export default class DynamicGUI {
         nodeSetting.add(SCACoralParameters, "maxThickness", 0.1, 30).step(0.1);
 
         nodeSetting.addColor(SCACoralParameters, "color");
+    }
+
+    generateEchninogorgiaCoralParameters() {
+        const enchinogorgiaCoralParameters = EnchinogorgiaCoral.getParams();
+        this.folder
+            .add(enchinogorgiaCoralParameters, "radius", 10, 50)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(enchinogorgiaCoralParameters, "numAttractors", 1, 5000)
+            .step(1)
+            .onChange(() => {
+                this.updateObject();
+            });
+        this.folder
+            .add(enchinogorgiaCoralParameters, "seed")
+            .name("Random Seed")
+            .listen();
+        this.folder
+            .add(
+                {
+                    regenerate: () => {
+                        enchinogorgiaCoralParameters.seed = Math.floor(
+                            RandomNumberGenerator.random() * 1000000
+                        );
+                        this.updateObject();
+                    },
+                },
+                "regenerate"
+            )
+            .name("Regenerate Seed");
+        this.folder.add(enchinogorgiaCoralParameters, "maxIteration");
+        this.folder
+            .add(
+                {
+                    startRender: async () => {
+                        this.disable();
+                        this.updateObject();
+                        await this.objectGenerator.startRender();
+                        this.enable();
+                    },
+                },
+                "startRender"
+            )
+            .name("Render");
+
+        const attractorSetting = this.addFolder("Attractor Setting");
+        attractorSetting
+            .add(enchinogorgiaCoralParameters, "influenceDistance", 1, 30)
+            .step(1);
+        attractorSetting
+            .add(enchinogorgiaCoralParameters, "killDistance", 1, 30)
+            .step(1);
+
+        const nodeSetting = this.addFolder("Node Setting");
+        nodeSetting
+            .add(enchinogorgiaCoralParameters, "segmentLength", 1, 30)
+            .step(0.1);
+        nodeSetting
+            .add(enchinogorgiaCoralParameters, "basicThickness", 0.1, 30)
+            .step(0.1);
+        nodeSetting
+            .add(enchinogorgiaCoralParameters, "canalizeThickness", 0, 2)
+            .step(0.01);
+        nodeSetting
+            .add(enchinogorgiaCoralParameters, "maxThickness", 0.1, 30)
+            .step(0.1);
+
+        nodeSetting.addColor(enchinogorgiaCoralParameters, "color");
     }
 
     generateStaghornCoral2Parameters() {

@@ -25,13 +25,13 @@ export default class StaghornCoral extends MyAnimateObject {
         canalizeThickness: 0.01,
         maxThickness: 20,
         color: {
-            r: 139,
-            g: 69,
-            b: 19,
+            r: 154,
+            g: 205,
+            b: 50,
         },
     };
 
-    static NAME = "StaghornCoral";
+    static NAME = "AntipathesCoral";
 
     static getParams() {
         return StaghornCoral.PARAMS;
