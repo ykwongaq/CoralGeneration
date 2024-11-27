@@ -46,24 +46,33 @@ export default class Cylinder extends MyObject {
             thetaLength
         );
 
-        var textureLoader = new THREE.TextureLoader();
-        var materials = new THREE.MeshBasicMaterial({
-            map: textureLoader.load("./static/coral4.jpg"),
-        });
+        // var textureCoral = new THREE.TextureLoader().load("./static/coral4.jpg");
+        // textureCoral.wrapS = textureCoral.wrapT = THREE.RepeatWrapping;
+        // textureCoral.offset.set( 0, 0 );
+        // textureCoral.repeat.set( 2, 5 );
+        
+        // var materials = new THREE.MeshBasicMaterial({
+        //     map: textureCoral,
+        //     color: color,
+        // });
 
-        // const bumpMapMaterial = new THREE.MeshPhongMaterial()
-        // const texture = new THREE.TextureLoader().load('./static/11299-bump.jpg')
-        // material.map = texture
-        // const bumpTexture = new THREE.TextureLoader().load('./static/coral4.jpg')
-        // material.bumpMap = bumpTexture
-        // material.bumpScale = 0.025
+        const bumpMapMaterial = new THREE.MeshPhongMaterial()
+        bumpMapMaterial.castShadow = true;
+        const textureCoral = new THREE.TextureLoader().load('./static/coral4.jpg')
+        textureCoral.wrapS = textureCoral.wrapT = THREE.RepeatWrapping;
+        textureCoral.offset.set( 0, 0 );
+        textureCoral.repeat.set( 2, 5 );
+        bumpMapMaterial.map = textureCoral;
+        const bumpTexture = new THREE.TextureLoader().load('./static/7486-normal.jpg')
+        bumpMapMaterial.bumpMap = bumpTexture
+        bumpMapMaterial.bumpScale = 2
 
         // const color = Utils.RGB2Color(colorRGB.r, colorRGB.g, colorRGB.b);
         // this.material = new THREE.MeshBasicMaterial({
         //     color: color,
         //     wireframe: debugMode,
         // });
-        this.mesh = new THREE.Mesh(this.geometry, materials);
+        this.mesh = new THREE.Mesh(this.geometry, bumpMapMaterial);
     }
 
     static getParams() {

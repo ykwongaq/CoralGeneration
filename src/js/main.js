@@ -46,35 +46,32 @@ function main() {
     controls.maxDistance = camera.far;
     controls.minDistance = camera.near;
 
-    // // Ambient Light
-    // const Ambient = new THREE.AmbientLight(0xffffff, 0.5);
-    // scene.add(Ambient);
-
-    // // Directional Light
-    // const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    // directionalLight.position.set(10, 10, 10);
-    // scene.add(directionalLight);
-
     let pointLight = new THREE.PointLight(0xffffff, 150);
-    let hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 2);
-    pointLight.position.set(20, 50, 20);
+    let hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
+    pointLight.position.set(10, 10, 0);
     pointLight.castShadow = true;
+    pointLight.shadow.mapSize.width = 1000; // default
+    pointLight.shadow.mapSize.height = 1000; // default
+    pointLight.shadow.camera.near = 0.5; // default
+    pointLight.shadow.camera.far = 500; // default
     scene.add(pointLight, hemisphereLight);
     let seabedTexture = new THREE.TextureLoader().load("./static/seabed.jpg");
-    seabedTexture.wrapS = seabedTexture.wrapT = THREE.RepeatWrapping;
+    seabedTexture.wrapS = seabedTexture.wrapT = THREE.MirroredRepeatWrapping;
     seabedTexture.repeat.set(50, 50);
     let seabedGeometry = new THREE.PlaneGeometry(1000, 1000);
-    let seabedMaterial = new THREE.MeshPhongMaterial({ map: seabedTexture });
+    let seabedMaterial = new THREE.MeshLambertMaterial({ map: seabedTexture });
     let seabed = new THREE.Mesh(seabedGeometry, seabedMaterial);
     seabed.position.y = 0;
     seabed.rotation.x = -Math.PI / 2;
-    seabed.receiveShadow = true;
+    seabed.receiveShadow = true;    
     scene.add(seabed);
 
-    renderer.gammaOutput = true;
-    renderer.physicallyCorrectLights = true;
+    // renderer.gammaOutput = true;
+    // renderer.physicallyCorrectLights = true;
+    // renderer.shadowMap.enabled = true;
+    // renderer.shadowMapSoft = true;
     renderer.shadowMap.enabled = true;
-    renderer.shadowMapSoft = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     // User control GUI
     const gui = new DynamicGUI(scene);
