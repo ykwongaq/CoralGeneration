@@ -157,7 +157,7 @@ export default class BranchCoral extends MyObject {
                     var endPoint = this.createBranch(
                         currentBranchCondition.getPosition(),
                         currentBranchCondition.getDirection(),
-                        currentBranchCondition.getThickness(),
+                        currentBranchCondition.getThickness()*0.8,
                         currentBranchCondition.getThickness(),
                         currentBranchCondition.getLength()
                     );

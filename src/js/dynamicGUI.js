@@ -21,7 +21,7 @@ import PreciousCoral from "./objects/preciousCoral";
 import { GUI } from "dat.gui";
 
 export default class DynamicGUI {
-    static DEFAULT_OBJECT = Cube.NAME;
+    static DEFAULT_OBJECT =  WhipCoral.NAME;
     constructor(scene) {
         this.scene = scene;
         this.objectGenerator = new ObjectGenerator(scene);
