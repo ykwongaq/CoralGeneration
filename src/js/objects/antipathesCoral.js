@@ -8,56 +8,54 @@ import Utils from "../utils";
 
 import * as THREE from "three";
 
-export default class SCA_Test extends MyAnimateObject {
+export default class AntipathesCoral extends MyAnimateObject {
     static PARAMS = {
+        radius: 30,
+        numAttractors: 3000,
         seed: RandomNumberGenerator.DEFAULT_SEED,
         maxIteration: 1000,
 
         // Attractors
-        influenceDistance: 10,
-        killDistance: 2,
-        positionX: -5,
-        positionY: 5,
-        positionZ: 5,
+        influenceDistance: 30,
+        killDistance: 1,
 
         // Node
-        segmentLength: 0.5,
-        basicThickness: 1,
-        canalizeThickness: 0.1,
+        segmentLength: 1,
+        basicThickness: 5,
+        canalizeThickness: 0,
         maxThickness: 20,
         color: {
-            r: 139,
-            g: 69,
-            b: 19,
+            r: 128,
+            g: 0,
+            b: 128,
         },
     };
 
-    static NAME = "SCA-Test";
+    static NAME = "AntipathesCoral";
 
     static getParams() {
-        return SCA_Test.PARAMS;
+        return AntipathesCoral.PARAMS;
     }
 
     constructor(
         scene,
         debugMode = false,
-        // numAttractors = SC_Coral_Test.PARAMS.numAttractors,
-        seed = SCA_Test.PARAMS.seed,
-        maxIteration = SCA_Test.PARAMS.maxIteration,
-        influenceDistance = SCA_Test.PARAMS.influenceDistance,
-        killDistance = SCA_Test.PARAMS.killDistance,
-        segmentLength = SCA_Test.PARAMS.segmentLength,
-        basicThickness = SCA_Test.PARAMS.basicThickness,
-        canalizeThickness = SCA_Test.PARAMS.canalizeThickness,
-        maxThickness = SCA_Test.PARAMS.maxThickness,
-        colorRGB = SCA_Test.PARAMS.color,
-        positionX = SCA_Test.PARAMS.positionX,
-        positionY = SCA_Test.PARAMS.positionY,
-        positionZ = SCA_Test.PARAMS.positionZ
+        radius = AntipathesCoral.PARAMS.radius,
+        numAttractors = AntipathesCoral.PARAMS.numAttractors,
+        seed = AntipathesCoral.PARAMS.seed,
+        maxIteration = AntipathesCoral.PARAMS.maxIteration,
+        influenceDistance = AntipathesCoral.PARAMS.influenceDistance,
+        killDistance = AntipathesCoral.PARAMS.killDistance,
+        segmentLength = AntipathesCoral.PARAMS.segmentLength,
+        basicThickness = AntipathesCoral.PARAMS.basicThickness,
+        canalizeThickness = AntipathesCoral.PARAMS.canalizeThickness,
+        maxThickness = AntipathesCoral.PARAMS.maxThickness,
+        colorRGB = AntipathesCoral.PARAMS.color
     ) {
         super(scene, debugMode);
         RandomNumberGenerator.setSeed(seed);
-        this.seed = seed;
+        this.radius = radius;
+        this.numAttractors = numAttractors;
         this.influenceDistance = influenceDistance;
         this.killDistance = killDistance;
         this.segmentLength = segmentLength;
@@ -66,10 +64,6 @@ export default class SCA_Test extends MyAnimateObject {
         this.maxThickness = maxThickness;
         this.colorRGB = colorRGB;
         this.maxIteration = maxIteration;
-
-        this.positionX = positionX;
-        this.positionY = positionY;
-        this.positionZ = positionZ;
 
         this.SCA = null;
     }
@@ -80,8 +74,6 @@ export default class SCA_Test extends MyAnimateObject {
         if (this.debugMode) {
             for (const attractor of attractors) {
                 attractor.generate();
-                attractor.showInference();
-                attractor.showKill();
             }
         }
         const nodes = [];
@@ -106,20 +98,44 @@ export default class SCA_Test extends MyAnimateObject {
     }
 
     generateAttractors() {
-        const position = new THREE.Vector3(
-            this.positionX,
-            this.positionY,
-            this.positionZ
-        );
         const attractors = [];
-        const attractor = new Attractor(
-            this.scene,
-            this.debugMode,
-            position,
-            this.influenceDistance,
-            this.killDistance
-        );
-        attractors.push(attractor);
+
+        this.height = 1;
+        this.radius = 20;
+
+        for (let i = 0; i < this.numAttractors; i++) {
+            const y_ =
+                RandomNumberGenerator.seedRandom() * this.height -
+                this.height / 2;
+
+            // Random radial distance, sampled proportionally to area
+            const r =
+                Math.sqrt(RandomNumberGenerator.seedRandom()) * this.radius;
+
+            // Random angle around the circular cross-section
+            const theta = RandomNumberGenerator.seedRandom() * 2 * Math.PI;
+
+            // Convert polar coordinates to Cartesian coordinates
+            let x_ = r * Math.cos(theta);
+            let z_ = r * Math.sin(theta);
+
+            let x = x_;
+            let y = z_;
+            let z = y_;
+
+            y += this.radius;
+
+            const point = new THREE.Vector3(x, y, z);
+
+            const attractor = new Attractor(
+                this.scene,
+                this.debugMode,
+                point,
+                this.influenceDistance,
+                this.killDistance
+            );
+            attractors.push(attractor);
+        }
         return attractors;
     }
 

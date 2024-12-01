@@ -3,6 +3,11 @@ import MyObject from "./myObject";
 import RandomNumberGenerator from "../randomNumberGenerator";
 import Attractor from "../SCA/attractor";
 
+import fs from "fs";
+import { Scene, Mesh, MeshStandardMaterial, Color } from "three";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js"; // Modern FontLoader
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js"; // Modern TextGeometry
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js"; // Modern GLTFExporter
 export default class AttractorTest extends MyObject {
     static PARAMS = {
         radius: 10,
@@ -51,48 +56,36 @@ export default class AttractorTest extends MyObject {
         // this.mesh = new THREE.Mesh(geometry, material);
     }
 
-    generate() {
-        super.generate();
-
-        this.radius = 5;
-        let height = 10;
-
-        for (let i = 0; i < this.numPoints; i++) {
-            // Random height position (y-coordinate)
-            let y_ = RandomNumberGenerator.seedRandom() * height - height / 2; // Center the cylinder at the origin
-
-            // Random radial distance, sampled proportionally to area
-            const r =
-                Math.sqrt(RandomNumberGenerator.seedRandom()) * this.radius;
-
-            // Random angle around the circular cross-section
-            const theta = RandomNumberGenerator.seedRandom() * 2 * Math.PI;
-
-            // Convert polar coordinates to Cartesian coordinates
-            let x_ = r * Math.cos(theta);
-            let z_ = r * Math.sin(theta);
-
-            let x = x_;
-            let y = z_;
-            let z = y_;
-
-            y += height;
-
-            const point = new THREE.Vector3(x, y, z);
-
-            const attractor = new Attractor(
-                this.scene,
-                this.debugMode,
-                point,
-                this.influenceDistance,
-                this.killDistance
+    async generate() {
+        const fontLoader = new FontLoader();
+        const font = await new Promise((resolve, reject) => {
+            fontLoader.load(
+                "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
+                resolve,
+                undefined,
+                reject
             );
-            attractor.generate();
+        });
 
-            // if (this.debugMode) {
-            //     attractor.showInference();
-            //     attractor.showKill();
-            // }
-        }
+        // Create 3D Text Geometry
+        const textGeometry = new TextGeometry("H", {
+            font: font,
+            size: 2, // Letter size
+            depth: 0.5, // Extrusion depth
+            curveSegments: 12, // Smoothness of curves
+            bevelEnabled: true, // Add bevel (rounded edges)
+            bevelThickness: 0.1,
+            bevelSize: 0.1,
+            bevelSegments: 5,
+        });
+
+        // Create material and mesh
+        const textMaterial = new THREE.MeshStandardMaterial({
+            color: 0x0077ff,
+        });
+        const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+        textMesh.position.set(0, 0, 0);
+        textMesh.isMyObject = true;
+        this.scene.add(textMesh);
     }
 }

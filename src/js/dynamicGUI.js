@@ -11,8 +11,8 @@ import Curve from "./objects/curve";
 import BranchCoralCurve from "./objects/branchCoralCurve";
 import AttractorTest from "./objects/attractorTest";
 import SCA_Test from "./objects/SCA_Test";
+import AntipathesCoral from "./objects/antipathesCoral";
 import StaghornCoral from "./objects/staghornCoral";
-import StaghornCoral2 from "./objects/staghornCoral2";
 import AntlerCoral from "./objects/antlerCoral";
 import ObstacleTest from "./objects/obstacleTest";
 import WhipCoral from "./objects/whipCoral";
@@ -46,8 +46,8 @@ export default class DynamicGUI {
             LSystemTree.NAME,
             BranchCoral.NAME,
             WhipCoral.NAME,
+            AntipathesCoral.NAME,
             StaghornCoral.NAME,
-            StaghornCoral2.NAME,
             EnchinogorgiaCoral.NAME,
             AntlerCoral.NAME,
             PreciousCoral.NAME,
@@ -156,10 +156,10 @@ export default class DynamicGUI {
             case SCA_Test.NAME:
                 this.generateSCATestParameters();
                 break;
-            case StaghornCoral.NAME:
+            case AntipathesCoral.NAME:
                 this.generateStaghornCoralParameters();
                 break;
-            case StaghornCoral2.NAME:
+            case StaghornCoral.NAME:
                 this.generateStaghornCoral2Parameters();
                 break;
             case AntlerCoral.NAME:
@@ -866,7 +866,7 @@ export default class DynamicGUI {
     }
 
     generateStaghornCoralParameters() {
-        const SCACoralParameters = StaghornCoral.getParams();
+        const SCACoralParameters = AntipathesCoral.getParams();
         this.folder
             .add(SCACoralParameters, "radius", 10, 50)
             .step(1)
@@ -1002,7 +1002,7 @@ export default class DynamicGUI {
     }
 
     generateStaghornCoral2Parameters() {
-        const StaghornCoral2Parameters = StaghornCoral2.getParams();
+        const StaghornCoral2Parameters = StaghornCoral.getParams();
         this.folder
             .add(StaghornCoral2Parameters, "radius", 10, 50)
             .step(1)

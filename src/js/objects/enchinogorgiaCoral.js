@@ -11,23 +11,23 @@ import * as THREE from "three";
 export default class EnchinogorgiaCoral extends MyAnimateObject {
     static PARAMS = {
         radius: 30,
-        numAttractors: 3000,
+        numAttractors: 2000,
         seed: RandomNumberGenerator.DEFAULT_SEED,
         maxIteration: 1000,
 
         // Attractors
         influenceDistance: 30,
-        killDistance: 1,
+        killDistance: 2,
 
         // Node
         segmentLength: 1,
         basicThickness: 5,
-        canalizeThickness: 0,
+        canalizeThickness: 0.01,
         maxThickness: 20,
         color: {
-            r: 128,
-            g: 0,
-            b: 128,
+            r: 193,
+            g: 224,
+            b: 192,
         },
     };
 
@@ -99,31 +99,17 @@ export default class EnchinogorgiaCoral extends MyAnimateObject {
 
     generateAttractors() {
         const attractors = [];
-
-        this.height = 1;
-        this.radius = 20;
-
         for (let i = 0; i < this.numAttractors; i++) {
-            const y_ =
-                RandomNumberGenerator.seedRandom() * this.height -
-                this.height / 2;
+            const r = RandomNumberGenerator.seedRandom(
+                this.radius * 0.3,
+                this.radius
+            );
+            const theta = RandomNumberGenerator.seedRandom() * Math.PI;
+            const phi = Math.acos(2 * RandomNumberGenerator.seedRandom() - 1);
 
-            // Random radial distance, sampled proportionally to area
-            const r =
-                Math.sqrt(RandomNumberGenerator.seedRandom()) * this.radius;
-
-            // Random angle around the circular cross-section
-            const theta = RandomNumberGenerator.seedRandom() * 2 * Math.PI;
-
-            // Convert polar coordinates to Cartesian coordinates
-            let x_ = r * Math.cos(theta);
-            let z_ = r * Math.sin(theta);
-
-            let x = x_;
-            let y = z_;
-            let z = y_;
-
-            y += this.radius;
+            const x = r * Math.sin(phi) * Math.cos(theta);
+            const y = r * Math.sin(phi) * Math.sin(theta);
+            const z = r * Math.cos(phi);
 
             const point = new THREE.Vector3(x, y, z);
 

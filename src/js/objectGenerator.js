@@ -9,8 +9,8 @@ import BranchCoralCurve from "./objects/branchCoralCurve.js";
 import AttractorTest from "./objects/attractorTest.js";
 import SCA_Test from "./objects/SCA_Test.js";
 import MyAnimateObject from "./objects/myAnimateObject.js";
+import AntipathesCoral from "./objects/antipathesCoral.js";
 import StaghornCoral from "./objects/staghornCoral.js";
-import StaghornCoral2 from "./objects/staghornCoral2.js";
 import AntlerCoral from "./objects/antlerCoral.js";
 import ObstacleTest from "./objects/obstacleTest.js";
 import WhipCoral from "./objects/whipCoral.js";
@@ -63,11 +63,11 @@ export default class ObjectGenerator {
             case SCA_Test.NAME:
                 this.object = new SCA_Test(this.scene, this.debugMode);
                 break;
+            case AntipathesCoral.NAME:
+                this.object = new AntipathesCoral(this.scene, this.debugMode);
+                break;
             case StaghornCoral.NAME:
                 this.object = new StaghornCoral(this.scene, this.debugMode);
-                break;
-            case StaghornCoral2.NAME:
-                this.object = new StaghornCoral2(this.scene, this.debugMode);
                 break;
             case AntlerCoral.NAME:
                 this.object = new AntlerCoral(this.scene, this.debugMode);

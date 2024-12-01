@@ -8,7 +8,7 @@ import Utils from "../utils";
 
 import * as THREE from "three";
 
-export default class StaghornCoral extends MyAnimateObject {
+export default class StaghornCoral2 extends MyAnimateObject {
     static PARAMS = {
         radius: 30,
         numAttractors: 2000,
@@ -21,36 +21,36 @@ export default class StaghornCoral extends MyAnimateObject {
 
         // Node
         segmentLength: 1,
-        basicThickness: 5,
+        basicThickness: 3,
         canalizeThickness: 0.01,
-        maxThickness: 20,
+        maxThickness: 15,
         color: {
-            r: 154,
-            g: 205,
-            b: 50,
+            r: 139,
+            g: 69,
+            b: 19,
         },
     };
 
-    static NAME = "AntipathesCoral";
+    static NAME = "StaghornCoral";
 
     static getParams() {
-        return StaghornCoral.PARAMS;
+        return StaghornCoral2.PARAMS;
     }
 
     constructor(
         scene,
         debugMode = false,
-        radius = StaghornCoral.PARAMS.radius,
-        numAttractors = StaghornCoral.PARAMS.numAttractors,
-        seed = StaghornCoral.PARAMS.seed,
-        maxIteration = StaghornCoral.PARAMS.maxIteration,
-        influenceDistance = StaghornCoral.PARAMS.influenceDistance,
-        killDistance = StaghornCoral.PARAMS.killDistance,
-        segmentLength = StaghornCoral.PARAMS.segmentLength,
-        basicThickness = StaghornCoral.PARAMS.basicThickness,
-        canalizeThickness = StaghornCoral.PARAMS.canalizeThickness,
-        maxThickness = StaghornCoral.PARAMS.maxThickness,
-        colorRGB = StaghornCoral.PARAMS.color
+        radius = StaghornCoral2.PARAMS.radius,
+        numAttractors = StaghornCoral2.PARAMS.numAttractors,
+        seed = StaghornCoral2.PARAMS.seed,
+        maxIteration = StaghornCoral2.PARAMS.maxIteration,
+        influenceDistance = StaghornCoral2.PARAMS.influenceDistance,
+        killDistance = StaghornCoral2.PARAMS.killDistance,
+        segmentLength = StaghornCoral2.PARAMS.segmentLength,
+        basicThickness = StaghornCoral2.PARAMS.basicThickness,
+        canalizeThickness = StaghornCoral2.PARAMS.canalizeThickness,
+        maxThickness = StaghornCoral2.PARAMS.maxThickness,
+        colorRGB = StaghornCoral2.PARAMS.color
     ) {
         super(scene, debugMode);
         RandomNumberGenerator.setSeed(seed);
@@ -101,15 +101,19 @@ export default class StaghornCoral extends MyAnimateObject {
         const attractors = [];
         for (let i = 0; i < this.numAttractors; i++) {
             const r = RandomNumberGenerator.seedRandom(
-                this.radius * 0.3,
+                this.radius * 0.05,
                 this.radius
             );
             const theta = RandomNumberGenerator.seedRandom() * Math.PI;
             const phi = Math.acos(2 * RandomNumberGenerator.seedRandom() - 1);
 
-            const x = r * Math.sin(phi) * Math.cos(theta);
-            const y = r * Math.sin(phi) * Math.sin(theta);
-            const z = r * Math.cos(phi);
+            let x = r * Math.sin(phi) * Math.cos(theta);
+            let y = r * Math.sin(phi) * Math.sin(theta);
+            let z = r * Math.cos(phi);
+
+            // Flip the sphere
+            y = this.radius - y;
+            y = y + 3;
 
             const point = new THREE.Vector3(x, y, z);
 
