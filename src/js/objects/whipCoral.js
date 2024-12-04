@@ -62,9 +62,10 @@ export default class WhipCoral extends MyObject {
         this.curveType = curveType;
 
         const axiom = "[+[+F][+F][+F]][+[+F][+F][+F]][+[+F][+F][+F]]";
+        // const axiom = "[+F][+F][+F]";
         const rules = {
             F: [
-                { replacement: "L-F", probability: 0.65 },
+                { replacement: "LF", probability: 0.65 },
                 { replacement: "L[+F][+F]", probability: 0.25 },
                 { replacement: "L[+F][+F][+F]", probability: 0.1 },
             ],
