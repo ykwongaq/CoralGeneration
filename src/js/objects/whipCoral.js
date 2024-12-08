@@ -148,7 +148,8 @@ export default class WhipCoral extends MyObject {
                                 Utils.getUpVector().normalize(),
                                 newDirection.clone()
                             );
-                            alpha = Math.max(0, Math.min(1, alpha));
+                            // alpha = Math.max(0, Math.min(1, alpha));
+                            alpha = (alpha + 1) / 2;
 
                             const vector1 = Utils.getUpVector()
                                 .clone()
