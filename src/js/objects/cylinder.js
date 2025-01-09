@@ -50,29 +50,33 @@ export default class Cylinder extends MyObject {
         // textureCoral.wrapS = textureCoral.wrapT = THREE.RepeatWrapping;
         // textureCoral.offset.set( 0, 0 );
         // textureCoral.repeat.set( 2, 5 );
-        
+
         // var materials = new THREE.MeshBasicMaterial({
         //     map: textureCoral,
         //     color: color,
         // });
 
-        const bumpMapMaterial = new THREE.MeshPhongMaterial()
+        const bumpMapMaterial = new THREE.MeshPhongMaterial();
         bumpMapMaterial.castShadow = true;
-        const textureCoral = new THREE.TextureLoader().load('./static/coral4.jpg')
+        const textureCoral = new THREE.TextureLoader().load(
+            "./static/coral4.jpg"
+        );
         textureCoral.wrapS = textureCoral.wrapT = THREE.RepeatWrapping;
-        textureCoral.offset.set( 0, 0 );
-        textureCoral.repeat.set( 2, 5 );
-        bumpMapMaterial.map = textureCoral;
-        const bumpTexture = new THREE.TextureLoader().load('./static/7486-normal.jpg')
-        bumpMapMaterial.bumpMap = bumpTexture
-        bumpMapMaterial.bumpScale = 2
+        textureCoral.offset.set(0, 0);
+        textureCoral.repeat.set(2, 5);
+        // bumpMapMaterial.map = textureCoral;
+        const bumpTexture = new THREE.TextureLoader().load(
+            "./static/7486-normal.jpg"
+        );
+        bumpMapMaterial.bumpMap = bumpTexture;
+        bumpMapMaterial.bumpScale = 2;
 
-        // const color = Utils.RGB2Color(colorRGB.r, colorRGB.g, colorRGB.b);
-        // this.material = new THREE.MeshBasicMaterial({
-        //     color: color,
-        //     wireframe: debugMode,
-        // });
-        this.mesh = new THREE.Mesh(this.geometry, bumpMapMaterial);
+        const color = Utils.RGB2Color(colorRGB.r, colorRGB.g, colorRGB.b);
+        this.material = new THREE.MeshBasicMaterial({
+            color: color,
+            wireframe: debugMode,
+        });
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
     }
 
     static getParams() {

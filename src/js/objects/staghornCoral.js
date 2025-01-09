@@ -8,7 +8,7 @@ import Utils from "../utils";
 
 import * as THREE from "three";
 
-export default class StaghornCoral2 extends MyAnimateObject {
+export default class StaghornCoral extends MyAnimateObject {
     static PARAMS = {
         radius: 30,
         numAttractors: 2000,
@@ -34,23 +34,23 @@ export default class StaghornCoral2 extends MyAnimateObject {
     static NAME = "StaghornCoral";
 
     static getParams() {
-        return StaghornCoral2.PARAMS;
+        return StaghornCoral.PARAMS;
     }
 
     constructor(
         scene,
         debugMode = false,
-        radius = StaghornCoral2.PARAMS.radius,
-        numAttractors = StaghornCoral2.PARAMS.numAttractors,
-        seed = StaghornCoral2.PARAMS.seed,
-        maxIteration = StaghornCoral2.PARAMS.maxIteration,
-        influenceDistance = StaghornCoral2.PARAMS.influenceDistance,
-        killDistance = StaghornCoral2.PARAMS.killDistance,
-        segmentLength = StaghornCoral2.PARAMS.segmentLength,
-        basicThickness = StaghornCoral2.PARAMS.basicThickness,
-        canalizeThickness = StaghornCoral2.PARAMS.canalizeThickness,
-        maxThickness = StaghornCoral2.PARAMS.maxThickness,
-        colorRGB = StaghornCoral2.PARAMS.color
+        radius = StaghornCoral.PARAMS.radius,
+        numAttractors = StaghornCoral.PARAMS.numAttractors,
+        seed = StaghornCoral.PARAMS.seed,
+        maxIteration = StaghornCoral.PARAMS.maxIteration,
+        influenceDistance = StaghornCoral.PARAMS.influenceDistance,
+        killDistance = StaghornCoral.PARAMS.killDistance,
+        segmentLength = StaghornCoral.PARAMS.segmentLength,
+        basicThickness = StaghornCoral.PARAMS.basicThickness,
+        canalizeThickness = StaghornCoral.PARAMS.canalizeThickness,
+        maxThickness = StaghornCoral.PARAMS.maxThickness,
+        colorRGB = StaghornCoral.PARAMS.color
     ) {
         super(scene, debugMode);
         RandomNumberGenerator.setSeed(seed);
