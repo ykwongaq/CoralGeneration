@@ -9,4 +9,7 @@ export default defineConfig({
             },
         },
     },
+    server: {
+        open: "/demo.html", // Automatically opens demo.html on localhost
+    },
 });
