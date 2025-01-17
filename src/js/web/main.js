@@ -1,84 +1,52 @@
-/*
-	Alpha by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js";
 
-(function($) {
+// Grab the canvas from our HTML
+const canvas = document.getElementById("canvas");
 
-	var	$window = $(window),
-		$body = $('body'),
-		$header = $('#header'),
-		$banner = $('#banner');
+// Create a renderer that uses this canvas
+const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true,
+});
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-	// Breakpoints.
-		breakpoints({
-			wide:      ( '1281px',  '1680px' ),
-			normal:    ( '981px',   '1280px' ),
-			narrow:    ( '737px',   '980px'  ),
-			narrower:  ( '737px',   '840px'  ),
-			mobile:    ( '481px',   '736px'  ),
-			mobilep:   ( null,      '480px'  )
-		});
+// Create a scene
+const scene = new THREE.Scene();
 
-	// Play initial animations on page load.
-		$window.on('load', function() {
-			window.setTimeout(function() {
-				$body.removeClass('is-preload');
-			}, 100);
-		});
+// Create a camera (FOV, aspect ratio, near/far clipping planes)
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
+camera.position.z = 3; // Move camera back so we can see the cube
 
-	// Dropdowns.
-		$('#nav > ul').dropotron({
-			alignment: 'right'
-		});
+// Create a box geometry and a simple material
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
 
-	// NavPanel.
+// Add the cube to the scene
+scene.add(cube);
 
-		// Button.
-			$(
-				'<div id="navButton">' +
-					'<a href="#navPanel" class="toggle"></a>' +
-				'</div>'
-			)
-				.appendTo($body);
+// Animation loop
+function animate() {
+    requestAnimationFrame(animate);
 
-		// Panel.
-			$(
-				'<div id="navPanel">' +
-					'<nav>' +
-						$('#nav').navList() +
-					'</nav>' +
-				'</div>'
-			)
-				.appendTo($body)
-				.panel({
-					delay: 500,
-					hideOnClick: true,
-					hideOnSwipe: true,
-					resetScroll: true,
-					resetForms: true,
-					side: 'left',
-					target: $body,
-					visibleClass: 'navPanel-visible'
-				});
+    // Rotate the cube
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
 
-	// Header.
-		if (!browser.mobile
-		&&	$header.hasClass('alt')
-		&&	$banner.length > 0) {
+    // Render the scene from the perspective of the camera
+    renderer.render(scene, camera);
+}
 
-			$window.on('load', function() {
+animate();
 
-				$banner.scrollex({
-					bottom:		$header.outerHeight(),
-					terminate:	function() { $header.removeClass('alt'); },
-					enter:		function() { $header.addClass('alt reveal'); },
-					leave:		function() { $header.removeClass('alt'); }
-				});
-
-			});
-
-		}
-
-})(jQuery);
+// Make the scene responsive
+window.addEventListener("resize", () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+});

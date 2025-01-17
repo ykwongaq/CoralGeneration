@@ -18,39 +18,48 @@
         <div id="page-wrapper">
             <!-- Header -->
             <header id="header" class="alt">
-                <h1><a href="index.html">Coral Morphology Simulation</a></h1>
+                <h1><a href="index.html">Alpha</a> by HTML5 UP</h1>
+                <nav id="nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li>
+                            <a href="#" class="icon solid fa-angle-down"
+                                >Layouts</a
+                            >
+                            <ul>
+                                <li><a href="generic.html">Generic</a></li>
+                                <li><a href="contact.html">Contact</a></li>
+                                <li><a href="elements.html">Elements</a></li>
+                                <li>
+                                    <a href="#">Submenu</a>
+                                    <ul>
+                                        <li><a href="#">Option One</a></li>
+                                        <li><a href="#">Option Two</a></li>
+                                        <li><a href="#">Option Three</a></li>
+                                        <li><a href="#">Option Four</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="#" class="button">Sign Up</a></li>
+                    </ul>
+                </nav>
             </header>
 
             <!-- Banner -->
             <section id="banner">
-                <h2>Coral Morphology Simulation</h2>
+                <h2>Alpha</h2>
                 <p>
-                    Exploring Procedural Generation and Growth Algorithms for
-                    Coral Structures
+                    Another fine responsive site template freebie by HTML5 UP.
                 </p>
                 <ul class="actions special">
-                    <li>
-                        <a href="#main" class="button primary">Section 1</a>
-                    </li>
-                    <li>
-                        <a href="#second_main" class="button"> Section 2</a>
-                    </li>
+                    <li><a href="#" class="button primary">Sign Up</a></li>
+                    <li><a href="#" class="button">Learn More</a></li>
                 </ul>
             </section>
 
             <!-- Main -->
-            <!-- 
-                1. Demo
-                2. Procedurl Modeling
-                3. Space Colonization Algorithm
-                4. Demo
-                5. Existing Tool
-                6. Github Link & Email Address
-             -->
-            <section id="container" class="container">
-                <section class="box special">
-                    <canvas id="canvas"></canvas>
-                </section>
+            <section id="main" class="container">
                 <section class="box special">
                     <header class="major">
                         <h2>
@@ -70,7 +79,7 @@
                     /></span>
                 </section>
 
-                <section id="second_main" class="box special features">
+                <section class="box special features">
                     <div class="features-row">
                         <section>
                             <span
@@ -238,68 +247,12 @@
         </div>
 
         <!-- Scripts -->
-        <!-- <script src="src/js/web/jquery.min.js"></script> -->
-        <!-- <script src="src/js/web/jquery.dropotron.min.js"></script>
+        <script src="src/js/web/jquery.min.js"></script>
+        <script src="src/js/web/jquery.dropotron.min.js"></script>
         <script src="src/js/web/jquery.scrollex.min.js"></script>
         <script src="src/js/web/browser.min.js"></script>
         <script src="src/js/web/breakpoints.min.js"></script>
-        <script src="src/js/web/util.js"></script> -->
-        <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script> -->
-        <script type="module" src="src/js/web/main.js"></script>
-        <!-- Use Three.js as an ES module from a CDN -->
-        <!-- <script type="module">
-            import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js";
-
-            // Grab the canvas from our HTML
-            const canvas = document.getElementById("canvas");
-
-            // Create a renderer that uses this canvas
-            const renderer = new THREE.WebGLRenderer({
-                canvas,
-                antialias: true,
-            });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-
-            // Create a scene
-            const scene = new THREE.Scene();
-
-            // Create a camera (FOV, aspect ratio, near/far clipping planes)
-            const camera = new THREE.PerspectiveCamera(
-                75,
-                window.innerWidth / window.innerHeight,
-                0.1,
-                1000
-            );
-            camera.position.z = 3; // Move camera back so we can see the cube
-
-            // Create a box geometry and a simple material
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            const cube = new THREE.Mesh(geometry, material);
-
-            // Add the cube to the scene
-            scene.add(cube);
-
-            // Animation loop
-            function animate() {
-                requestAnimationFrame(animate);
-
-                // Rotate the cube
-                cube.rotation.x += 0.01;
-                cube.rotation.y += 0.01;
-
-                // Render the scene from the perspective of the camera
-                renderer.render(scene, camera);
-            }
-
-            animate();
-
-            // Make the scene responsive
-            window.addEventListener("resize", () => {
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-            });
-        </script> -->
+        <script src="src/js/web/util.js"></script>
+        <script src="src/js/web/main.js"></script>
     </body>
 </html>
