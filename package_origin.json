@@ -2,7 +2,7 @@
   "name": "coralgeneration",
   "version": "1.0.0",
   "description": "Coral Procedual Modeling",
-  "main": "index.html",
+  "main": "demo.html",
   "scripts": {
     "dev": "vite --host=localhost",
     "build": "vite build",
